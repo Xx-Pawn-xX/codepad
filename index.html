@@ -1,369 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
-
-  <meta
-    name="theme-color"
-    content="#090909"
-  >
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#090909">
 
   <title>CodePad</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
-  <!-- Monaco Editor loader -->
-  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/loader.js"></script>
-
+  <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- =========================
-         TOP BAR
-    ========================== -->
+  <header class="topbar">
 
-    <header class="topbar">
+    <div class="brand">
+      <div class="logo-mark">&lt;/&gt;</div>
 
-      <div class="brand">
+      <div>
+        <h1>CodePad</h1>
+        <span>Simple. Local. Yours.</span>
+      </div>
+    </div>
 
-        <div class="logo-mark">
-          &lt;/&gt;
-        </div>
+    <div class="top-actions">
+
+      <button class="icon-button" id="renameProjectButton">✎</button>
+
+      <button class="icon-button" id="importButton">↑</button>
+
+      <button class="icon-button" id="exportButton">↓</button>
+
+      <button class="primary-button" id="exportProjectButton">
+        Export Project
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <main class="workspace">
+
+    <aside class="sidebar">
+
+      <div class="project-header">
 
         <div>
-
-          <h1>CodePad</h1>
-
-          <span>
-            Simple. Local. Yours.
-          </span>
-
+          <div class="small-label">PROJECT</div>
+          <div class="project-name" id="projectName">
+            Untitled Project
+          </div>
         </div>
 
-      </div>
-
-
-      <div class="top-actions">
-
-        <button
-          class="icon-button"
-          id="renameProjectButton"
-          title="Rename project"
-          aria-label="Rename project"
-        >
-          ✎
-        </button>
-
-
-        <button
-          class="icon-button"
-          id="importButton"
-          title="Import files"
-          aria-label="Import files"
-        >
-          ↑
-        </button>
-
-
-        <button
-          class="icon-button"
-          id="exportButton"
-          title="Export current file"
-          aria-label="Export current file"
-        >
-          ↓
-        </button>
-
-
-        <button
-          class="primary-button"
-          id="exportProjectButton"
-        >
-          Export Project
+        <button class="icon-button project-new" id="newFileButton">
+          +
         </button>
 
       </div>
 
-    </header>
+
+      <div class="sidebar-title">
+
+        <span>FILES</span>
+
+        <button id="addFileButton">+</button>
+
+      </div>
 
 
-
-    <!-- =========================
-         WORKSPACE
-    ========================== -->
-
-    <main class="workspace">
+      <div class="file-list" id="fileList"></div>
 
 
-      <!-- =========================
-           SIDEBAR
-      ========================== -->
+      <div class="sidebar-footer">
 
-      <aside class="sidebar">
+        <button id="importSidebarButton">
+          Import Files
+        </button>
 
-        <div class="project-header">
+      </div>
 
-          <div>
-
-            <div class="small-label">
-              PROJECT
-            </div>
-
-            <div
-              class="project-name"
-              id="projectName"
-            >
-              Untitled Project
-            </div>
-
-          </div>
+    </aside>
 
 
-          <button
-            class="icon-button project-new"
-            id="newFileButton"
-            title="New file"
-            aria-label="New file"
-          >
-            +
-          </button>
+    <section class="editor-area">
 
+      <div class="tabs" id="tabs"></div>
+
+
+      <!-- OUR OWN EDITOR -->
+
+      <div class="editor-wrapper" id="editorWrapper">
+
+        <pre id="highlighting"
+             aria-hidden="true"><code id="highlightedCode"></code></pre>
+
+        <textarea
+          id="editor"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+        ></textarea>
+
+
+        <!-- AUTOCOMPLETE -->
+
+        <div id="suggestions" class="suggestions hidden"></div>
+
+      </div>
+
+
+      <div class="empty-state hidden" id="emptyState">
+
+        <div class="empty-icon">&lt;/&gt;</div>
+
+        <h2>Ready when you are.</h2>
+
+        <p>Create a file and start writing.</p>
+
+        <button class="primary-button" id="emptyNewFileButton">
+          Create File
+        </button>
+
+      </div>
+
+
+      <div class="statusbar">
+
+        <div id="fileStatus">No file open</div>
+
+        <div class="status-right">
+          <span id="languageStatus">Plain Text</span>
+          <span id="cursorStatus">Ln 1, Col 1</span>
         </div>
 
+      </div>
 
-        <div class="sidebar-title">
+    </section>
 
-          <span>
-            FILES
-          </span>
+  </main>
 
-          <button
-            id="addFileButton"
-            title="Add file"
-            aria-label="Add file"
-          >
-            +
-          </button>
-
-        </div>
+</div>
 
 
-        <div
-          class="file-list"
-          id="fileList"
-        ></div>
+<input type="file"
+       id="fileInput"
+       multiple
+       hidden>
 
 
-        <div class="sidebar-footer">
+<!-- MODAL -->
 
-          <button
-            id="importSidebarButton"
-          >
-            Import Files
-          </button>
+<div class="modal-overlay hidden" id="modalOverlay">
 
-        </div>
+  <div class="modal">
 
-      </aside>
+    <h2 id="modalTitle">Create New File</h2>
 
+    <p id="modalText">
+      Choose a file type.
+    </p>
 
-
-      <!-- =========================
-           EDITOR
-      ========================== -->
-
-      <section class="editor-area">
-
-
-        <!-- TABS -->
-
-        <div
-          class="tabs"
-          id="tabs"
-        ></div>
-
-
-
-        <!-- REAL MONACO EDITOR -->
-
-        <div
-          class="editor-wrapper"
-          id="editorWrapper"
-        >
-
-          <div
-            id="editor"
-            class="monaco-editor-container"
-          ></div>
-
-        </div>
-
-
-
-        <!-- EMPTY STATE -->
-
-        <div
-          class="empty-state hidden"
-          id="emptyState"
-        >
-
-          <div class="empty-icon">
-            &lt;/&gt;
-          </div>
-
-          <h2>
-            Ready when you are.
-          </h2>
-
-          <p>
-            Create a file and start writing.
-          </p>
-
-          <button
-            class="primary-button"
-            id="emptyNewFileButton"
-          >
-            Create File
-          </button>
-
-        </div>
-
-
-
-        <!-- STATUS BAR -->
-
-        <div class="statusbar">
-
-          <div
-            id="fileStatus"
-          >
-            No file open
-          </div>
-
-
-          <div class="status-right">
-
-            <span
-              id="languageStatus"
-            >
-              Plain Text
-            </span>
-
-
-            <span
-              id="cursorStatus"
-            >
-              Ln 1, Col 1
-            </span>
-
-          </div>
-
-        </div>
-
-      </section>
-
-    </main>
-
-  </div>
-
-
-
-  <!-- =========================
-       FILE INPUT
-  ========================== -->
-
-  <input
-    type="file"
-    id="fileInput"
-    multiple
-    hidden
-  >
-
-
-
-  <!-- =========================
-       MODAL
-  ========================== -->
-
-  <div
-    class="modal-overlay hidden"
-    id="modalOverlay"
-  >
-
-    <div
-      class="modal"
-      id="modal"
+    <input
+      type="text"
+      id="modalInput"
+      placeholder="Filename"
     >
 
-      <h2
-        id="modalTitle"
-      >
-        Create New File
-      </h2>
+    <div class="modal-actions">
 
+      <button class="secondary-button" id="modalCancel">
+        Cancel
+      </button>
 
-      <p
-        id="modalText"
-      >
-        Choose a file type.
-      </p>
-
-
-      <input
-        type="text"
-        id="modalInput"
-        placeholder="Filename"
-        autocomplete="off"
-      >
-
-
-      <div
-        class="modal-actions"
-      >
-
-        <button
-          class="secondary-button"
-          id="modalCancel"
-        >
-          Cancel
-        </button>
-
-
-        <button
-          class="primary-button"
-          id="modalConfirm"
-        >
-          Create
-        </button>
-
-      </div>
+      <button class="primary-button" id="modalConfirm">
+        Create
+      </button>
 
     </div>
 
   </div>
 
+</div>
 
 
-  <!-- =========================
-       APP
-  ========================== -->
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 
 </body>
-
 </html>
