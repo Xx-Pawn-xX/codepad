@@ -347,6 +347,64 @@ function escapeHtml(text) {
 
 
 /* =========================
+   MIME TYPES
+========================= */
+
+function getMimeType(filename) {
+
+  const extension =
+    getExtension(filename);
+
+
+  const mimeTypes = {
+
+    html: "text/html",
+    htm: "text/html",
+
+    css: "text/css",
+
+    js: "text/javascript",
+    mjs: "text/javascript",
+
+    ts: "text/plain",
+
+    json: "application/json",
+
+    md: "text/markdown",
+
+    txt: "text/plain",
+
+    py: "text/x-python",
+
+    java: "text/x-java-source",
+
+    c: "text/x-c",
+
+    cpp: "text/x-c++src",
+
+    cs: "text/plain",
+
+    php: "application/x-httpd-php",
+
+    sql: "application/sql",
+
+    xml: "application/xml",
+
+    yaml: "application/x-yaml",
+    yml: "application/x-yaml"
+
+  };
+
+
+  return (
+    mimeTypes[extension] ||
+    "text/plain"
+  );
+
+}
+
+
+/* =========================
    STARTER PROJECT
 ========================= */
 
@@ -1477,7 +1535,74 @@ fileInput.addEventListener(
 
 
 /* =========================
-   EXPORT FILE
+   EXPORT HELPERS
+========================= */
+
+function downloadFile(file) {
+
+  const mimeType =
+    getMimeType(
+      file.name
+    );
+
+
+  const blob =
+    new Blob(
+      [file.content],
+      {
+        type:
+          mimeType +
+          ";charset=utf-8"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const link =
+    document.createElement("a");
+
+
+  link.href =
+    url;
+
+
+  link.download =
+    file.name;
+
+
+  link.style.display =
+    "none";
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  setTimeout(
+    () => {
+
+      link.remove();
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    },
+    1000
+  );
+
+}
+
+
+/* =========================
+   EXPORT CURRENT FILE
 ========================= */
 
 function exportCurrentFile() {
@@ -1497,37 +1622,7 @@ function exportCurrentFile() {
   }
 
 
-  const blob =
-    new Blob(
-      [file.content],
-      {
-        type: "text/plain"
-      }
-    );
-
-
-  const url =
-    URL.createObjectURL(blob);
-
-
-  const link =
-    document.createElement("a");
-
-
-  link.href = url;
-
-  link.download =
-    file.name;
-
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  link.remove();
-
-
-  URL.revokeObjectURL(url);
+  downloadFile(file);
 
 }
 
@@ -1538,57 +1633,44 @@ function exportCurrentFile() {
 
 function exportProject() {
 
-  const exportData = {
-    name: project.name,
+  if (
+    project.files.length === 0
+  ) {
 
-    files:
-      project.files.map(
-        file => ({
-          name: file.name,
-          content: file.content
-        })
-      )
-  };
+    alert(
+      "This project has no files to export."
+    );
+
+    return;
+
+  }
 
 
-  const blob =
-    new Blob(
-      [
-        JSON.stringify(
-          exportData,
-          null,
-          2
-        )
-      ],
-      {
-        type:
-          "application/json"
-      }
+  const shouldExport =
+    confirm(
+      `Export ${project.files.length} file(s)?`
     );
 
 
-  const url =
-    URL.createObjectURL(blob);
+  if (!shouldExport) {
+    return;
+  }
 
 
-  const link =
-    document.createElement("a");
+  project.files.forEach(
+    (file, index) => {
 
+      setTimeout(
+        () => {
 
-  link.href = url;
+          downloadFile(file);
 
-  link.download =
-    `${project.name}.json`;
+        },
+        index * 500
+      );
 
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  link.remove();
-
-
-  URL.revokeObjectURL(url);
+    }
+  );
 
 }
 
