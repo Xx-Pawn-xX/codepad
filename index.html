@@ -1,36 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="theme-color"
-    content="#000000"
+    content="width=device-width, initial-scale=1, maximum-scale=1"
   >
 
   <title>CodePad</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
   <div class="app">
 
-
-    <!-- =========================
-         TOP BAR
-    ========================== -->
+    <!-- TOP BAR -->
 
     <header class="topbar">
 
@@ -41,13 +28,8 @@
         </div>
 
         <div>
-
           <h1>CodePad</h1>
-
-          <span>
-            Simple. Fast. Yours.
-          </span>
-
+          <span>Simple. Local. Yours.</span>
         </div>
 
       </div>
@@ -58,33 +40,26 @@
         <button
           class="icon-button"
           id="newFileButton"
-          title="New File"
+          title="New file"
         >
           +
         </button>
 
 
         <button
-          class="small-button"
+          class="icon-button"
           id="importButton"
+          title="Import file"
         >
-          Import
-        </button>
-
-
-        <button
-          class="small-button"
-          id="exportButton"
-        >
-          Export File
+          ⇧
         </button>
 
 
         <button
           class="primary-button"
-          id="exportProjectButton"
+          id="exportButton"
         >
-          Export Project
+          Export
         </button>
 
       </div>
@@ -92,20 +67,17 @@
     </header>
 
 
-
-    <!-- =========================
-         MAIN WORKSPACE
-    ========================== -->
+    <!-- MAIN -->
 
     <main class="workspace">
 
 
-      <!-- =========================
-           SIDEBAR
-      ========================== -->
+      <!-- SIDEBAR -->
 
-      <aside class="sidebar">
-
+      <aside
+        class="sidebar"
+        id="sidebar"
+      >
 
         <div class="project-header">
 
@@ -126,27 +98,22 @@
 
 
           <button
-            class="icon-button"
+            class="small-button"
             id="renameProjectButton"
-            title="Rename Project"
           >
-            ✎
+            Rename
           </button>
 
         </div>
 
 
-
         <div class="sidebar-title">
 
-          <span>
-            FILES
-          </span>
-
+          <span>FILES</span>
 
           <button
             id="addFileButton"
-            title="Add File"
+            title="Add file"
           >
             +
           </button>
@@ -154,33 +121,24 @@
         </div>
 
 
-
         <div
           class="file-list"
           id="fileList"
-        >
-        </div>
-
+        ></div>
 
 
         <div class="sidebar-footer">
 
-          <button
-            id="emptyNewFileButton"
-          >
-            + New File
+          <button id="exportProjectButton">
+            ⬇ Export Project
           </button>
 
         </div>
 
-
       </aside>
 
 
-
-      <!-- =========================
-           EDITOR
-      ========================== -->
+      <!-- EDITOR AREA -->
 
       <section class="editor-area">
 
@@ -190,15 +148,13 @@
         <div
           class="tabs"
           id="tabs"
-        >
-        </div>
-
+        ></div>
 
 
         <!-- EMPTY STATE -->
 
         <div
-          class="empty-state hidden"
+          class="empty-state"
           id="emptyState"
         >
 
@@ -206,21 +162,15 @@
             &lt;/&gt;
           </div>
 
-
-          <h2>
-            No file open
-          </h2>
-
+          <h2>Ready when you are.</h2>
 
           <p>
-            Create or import a file to start coding.
+            Create a file and start writing.
           </p>
 
-
           <button
+            id="emptyNewFileButton"
             class="primary-button"
-            id="emptyNewFileButton2"
-            onclick="document.getElementById('newFileButton').click()"
           >
             Create File
           </button>
@@ -228,31 +178,31 @@
         </div>
 
 
-
-        <!-- CODE EDITOR -->
+        <!-- EDITOR -->
 
         <div
           class="editor-wrapper"
           id="editorWrapper"
         >
 
-          <pre
+          <div
             class="line-numbers"
             id="lineNumbers"
-          >1</pre>
+          >
+            1
+          </div>
 
 
           <textarea
             id="editor"
             spellcheck="false"
+            autocorrect="off"
             autocapitalize="off"
             autocomplete="off"
-            autocorrect="off"
-            placeholder="Start typing..."
+            wrap="off"
           ></textarea>
 
         </div>
-
 
 
         <!-- STATUS BAR -->
@@ -268,16 +218,11 @@
 
           <div class="status-right">
 
-            <span
-              id="languageStatus"
-            >
+            <span id="languageStatus">
               Plain Text
             </span>
 
-
-            <span
-              id="cursorStatus"
-            >
+            <span id="cursorStatus">
               Ln 1, Col 1
             </span>
 
@@ -285,97 +230,93 @@
 
         </footer>
 
-
       </section>
-
 
     </main>
 
 
-  </div>
+    <!-- SEARCH -->
 
-
-
-  <!-- =========================
-       IMPORT INPUT
-  ========================== -->
-
-  <input
-    type="file"
-    id="fileInput"
-    multiple
-    hidden
-  >
-
-
-
-  <!-- =========================
-       MODAL
-  ========================== -->
-
-  <div
-    class="modal-overlay hidden"
-    id="modalOverlay"
-  >
-
-    <div class="modal">
-
-      <h2
-        id="modalTitle"
-      >
-        New File
-      </h2>
-
-
-      <p
-        id="modalText"
-      >
-        Enter a filename.
-      </p>
-
+    <div
+      class="search-panel hidden"
+      id="searchPanel"
+    >
 
       <input
-        type="text"
-        id="modalInput"
-        placeholder="filename"
-        autocomplete="off"
+        id="searchInput"
+        placeholder="Search current file..."
       >
 
+      <span id="searchCount">
+        0 results
+      </span>
 
-      <div class="modal-actions">
+      <button id="closeSearchButton">
+        ×
+      </button>
 
-        <button
-          class="secondary-button"
-          id="modalCancel"
+    </div>
+
+
+    <!-- HIDDEN FILE INPUT -->
+
+    <input
+      type="file"
+      id="fileInput"
+      multiple
+      hidden
+    >
+
+
+    <!-- MODAL -->
+
+    <div
+      class="modal-overlay hidden"
+      id="modalOverlay"
+    >
+
+      <div class="modal">
+
+        <h2 id="modalTitle">
+          New File
+        </h2>
+
+        <p id="modalText">
+          Enter a filename.
+        </p>
+
+        <input
+          id="modalInput"
+          placeholder="index.html"
         >
-          Cancel
-        </button>
 
+        <div class="modal-actions">
 
-        <button
-          class="primary-button"
-          id="modalConfirm"
-        >
-          Create
-        </button>
+          <button
+            id="modalCancel"
+            class="secondary-button"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="modalConfirm"
+            class="primary-button"
+          >
+            Create
+          </button>
+
+        </div>
 
       </div>
 
     </div>
 
+
   </div>
 
 
-
-  <!-- =========================
-       JAVASCRIPT
-  ========================== -->
-
-  <script
-    src="app.js"
-  ></script>
-
+  <script src="app.js"></script>
 
 </body>
-
 </html>
