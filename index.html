@@ -1,23 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#090909"
   >
 
   <title>CodePad</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <!-- Monaco Editor loader -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/loader.js"></script>
+
 </head>
+
 
 <body>
 
   <div class="app">
 
-    <!-- TOP BAR -->
+    <!-- =========================
+         TOP BAR
+    ========================== -->
 
     <header class="topbar">
 
@@ -28,8 +45,13 @@
         </div>
 
         <div>
+
           <h1>CodePad</h1>
-          <span>Simple. Local. Yours.</span>
+
+          <span>
+            Simple. Local. Yours.
+          </span>
+
         </div>
 
       </div>
@@ -39,27 +61,39 @@
 
         <button
           class="icon-button"
-          id="newFileButton"
-          title="New file"
+          id="renameProjectButton"
+          title="Rename project"
+          aria-label="Rename project"
         >
-          +
+          ✎
         </button>
 
 
         <button
           class="icon-button"
           id="importButton"
-          title="Import file"
+          title="Import files"
+          aria-label="Import files"
         >
-          ⇧
+          ↑
+        </button>
+
+
+        <button
+          class="icon-button"
+          id="exportButton"
+          title="Export current file"
+          aria-label="Export current file"
+        >
+          ↓
         </button>
 
 
         <button
           class="primary-button"
-          id="exportButton"
+          id="exportProjectButton"
         >
-          Export
+          Export Project
         </button>
 
       </div>
@@ -67,17 +101,19 @@
     </header>
 
 
-    <!-- MAIN -->
+
+    <!-- =========================
+         WORKSPACE
+    ========================== -->
 
     <main class="workspace">
 
 
-      <!-- SIDEBAR -->
+      <!-- =========================
+           SIDEBAR
+      ========================== -->
 
-      <aside
-        class="sidebar"
-        id="sidebar"
-      >
+      <aside class="sidebar">
 
         <div class="project-header">
 
@@ -98,10 +134,12 @@
 
 
           <button
-            class="small-button"
-            id="renameProjectButton"
+            class="icon-button project-new"
+            id="newFileButton"
+            title="New file"
+            aria-label="New file"
           >
-            Rename
+            +
           </button>
 
         </div>
@@ -109,11 +147,14 @@
 
         <div class="sidebar-title">
 
-          <span>FILES</span>
+          <span>
+            FILES
+          </span>
 
           <button
             id="addFileButton"
             title="Add file"
+            aria-label="Add file"
           >
             +
           </button>
@@ -129,8 +170,10 @@
 
         <div class="sidebar-footer">
 
-          <button id="exportProjectButton">
-            ⬇ Export Project
+          <button
+            id="importSidebarButton"
+          >
+            Import Files
           </button>
 
         </div>
@@ -138,7 +181,10 @@
       </aside>
 
 
-      <!-- EDITOR AREA -->
+
+      <!-- =========================
+           EDITOR
+      ========================== -->
 
       <section class="editor-area">
 
@@ -151,34 +197,8 @@
         ></div>
 
 
-        <!-- EMPTY STATE -->
 
-        <div
-          class="empty-state"
-          id="emptyState"
-        >
-
-          <div class="empty-icon">
-            &lt;/&gt;
-          </div>
-
-          <h2>Ready when you are.</h2>
-
-          <p>
-            Create a file and start writing.
-          </p>
-
-          <button
-            id="emptyNewFileButton"
-            class="primary-button"
-          >
-            Create File
-          </button>
-
-        </div>
-
-
-        <!-- EDITOR -->
+        <!-- REAL MONACO EDITOR -->
 
         <div
           class="editor-wrapper"
@@ -186,28 +206,47 @@
         >
 
           <div
-            class="line-numbers"
-            id="lineNumbers"
-          >
-            1
-          </div>
-
-
-          <textarea
             id="editor"
-            spellcheck="false"
-            autocorrect="off"
-            autocapitalize="off"
-            autocomplete="off"
-            wrap="off"
-          ></textarea>
+            class="monaco-editor-container"
+          ></div>
 
         </div>
 
 
+
+        <!-- EMPTY STATE -->
+
+        <div
+          class="empty-state hidden"
+          id="emptyState"
+        >
+
+          <div class="empty-icon">
+            &lt;/&gt;
+          </div>
+
+          <h2>
+            Ready when you are.
+          </h2>
+
+          <p>
+            Create a file and start writing.
+          </p>
+
+          <button
+            class="primary-button"
+            id="emptyNewFileButton"
+          >
+            Create File
+          </button>
+
+        </div>
+
+
+
         <!-- STATUS BAR -->
 
-        <footer class="statusbar">
+        <div class="statusbar">
 
           <div
             id="fileStatus"
@@ -218,105 +257,113 @@
 
           <div class="status-right">
 
-            <span id="languageStatus">
+            <span
+              id="languageStatus"
+            >
               Plain Text
             </span>
 
-            <span id="cursorStatus">
+
+            <span
+              id="cursorStatus"
+            >
               Ln 1, Col 1
             </span>
 
           </div>
 
-        </footer>
+        </div>
 
       </section>
 
     </main>
 
+  </div>
 
-    <!-- SEARCH -->
+
+
+  <!-- =========================
+       FILE INPUT
+  ========================== -->
+
+  <input
+    type="file"
+    id="fileInput"
+    multiple
+    hidden
+  >
+
+
+
+  <!-- =========================
+       MODAL
+  ========================== -->
+
+  <div
+    class="modal-overlay hidden"
+    id="modalOverlay"
+  >
 
     <div
-      class="search-panel hidden"
-      id="searchPanel"
+      class="modal"
+      id="modal"
     >
+
+      <h2
+        id="modalTitle"
+      >
+        Create New File
+      </h2>
+
+
+      <p
+        id="modalText"
+      >
+        Choose a file type.
+      </p>
+
 
       <input
-        id="searchInput"
-        placeholder="Search current file..."
+        type="text"
+        id="modalInput"
+        placeholder="Filename"
+        autocomplete="off"
       >
 
-      <span id="searchCount">
-        0 results
-      </span>
 
-      <button id="closeSearchButton">
-        ×
-      </button>
+      <div
+        class="modal-actions"
+      >
 
-    </div>
-
-
-    <!-- HIDDEN FILE INPUT -->
-
-    <input
-      type="file"
-      id="fileInput"
-      multiple
-      hidden
-    >
-
-
-    <!-- MODAL -->
-
-    <div
-      class="modal-overlay hidden"
-      id="modalOverlay"
-    >
-
-      <div class="modal">
-
-        <h2 id="modalTitle">
-          New File
-        </h2>
-
-        <p id="modalText">
-          Enter a filename.
-        </p>
-
-        <input
-          id="modalInput"
-          placeholder="index.html"
+        <button
+          class="secondary-button"
+          id="modalCancel"
         >
+          Cancel
+        </button>
 
-        <div class="modal-actions">
 
-          <button
-            id="modalCancel"
-            class="secondary-button"
-          >
-            Cancel
-          </button>
-
-          <button
-            id="modalConfirm"
-            class="primary-button"
-          >
-            Create
-          </button>
-
-        </div>
+        <button
+          class="primary-button"
+          id="modalConfirm"
+        >
+          Create
+        </button>
 
       </div>
 
     </div>
 
-
   </div>
 
+
+
+  <!-- =========================
+       APP
+  ========================== -->
 
   <script src="app.js"></script>
 
 </body>
+
 </html>
