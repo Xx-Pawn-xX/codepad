@@ -4,11 +4,11 @@
   --surface-2: #171717;
   --surface-3: #202020;
 
-  --border: #2a2a2a;
+  --border: #292929;
   --border-light: #383838;
 
-  --text: #f5f5f5;
-  --muted: #888;
+  --text: #f4f4f4;
+  --muted: #858585;
 
   --accent: #ffffff;
 
@@ -23,9 +23,10 @@
 
 html,
 body {
-  margin: 0;
   width: 100%;
   height: 100%;
+
+  margin: 0;
 
   background: var(--bg);
   color: var(--text);
@@ -41,9 +42,13 @@ body {
 }
 
 
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
 button,
-input,
-textarea {
+input {
   font: inherit;
 }
 
@@ -53,9 +58,16 @@ button {
 }
 
 
+button,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
 .app {
   width: 100%;
   height: 100%;
+
   display: flex;
   flex-direction: column;
 }
@@ -68,25 +80,34 @@ button {
 .topbar {
   height: 68px;
 
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 18px;
+  gap: 15px;
+
+  padding:
+    env(safe-area-inset-top)
+    18px
+    0;
 
   border-bottom:
     1px solid var(--border);
 
-  background: rgba(16, 16, 16, .95);
-
-  flex-shrink: 0;
+  background:
+    rgba(16, 16, 16, .97);
 }
 
 
 .brand {
   display: flex;
   align-items: center;
+
   gap: 11px;
+
+  min-width: 0;
 }
 
 
@@ -94,19 +115,21 @@ button {
   width: 38px;
   height: 38px;
 
+  flex-shrink: 0;
+
   display: grid;
   place-items: center;
 
-  background: #000;
-
   border:
-    1px solid #333;
+    1px solid #353535;
 
   border-radius: 10px;
 
-  color: white;
+  background: #000;
 
-  font-size: 13px;
+  color: #fff;
+
+  font-size: 12px;
   font-weight: 900;
 }
 
@@ -126,47 +149,56 @@ button {
 
   margin-top: 2px;
 
-  font-size: 11px;
-
   color: var(--muted);
+
+  font-size: 11px;
 }
 
 
 .top-actions {
   display: flex;
   align-items: center;
+
   gap: 7px;
+
+  flex-shrink: 0;
 }
 
 
 .icon-button,
 .primary-button,
-.small-button {
-  border: 1px solid var(--border-light);
+.small-button,
+.secondary-button {
+  min-height: 36px;
+
+  border:
+    1px solid var(--border-light);
+
+  border-radius: 9px;
 
   background: var(--surface-2);
 
   color: var(--text);
 
-  border-radius: 9px;
-
   transition:
-    transform .15s,
-    border-color .15s,
-    background .15s;
+    transform .12s ease,
+    border-color .15s ease,
+    background .15s ease;
 }
 
 
 .icon-button:hover,
 .primary-button:hover,
-.small-button:hover {
+.small-button:hover,
+.secondary-button:hover {
   border-color: var(--accent);
 }
 
 
 .icon-button:active,
 .primary-button:active,
-.small-button:active {
+.small-button:active,
+.secondary-button:active {
   transform: scale(.96);
 }
 
@@ -175,22 +207,40 @@ button {
   width: 36px;
   height: 36px;
 
-  font-size: 20px;
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  font-size: 18px;
+}
+
+
+.project-new {
+  font-size: 22px;
 }
 
 
 .primary-button {
-  min-height: 36px;
-
   padding: 0 14px;
 
-  font-size: 13px;
-  font-weight: 700;
+  border-color: var(--accent);
 
   background: var(--accent);
+
   color: #000;
 
-  border-color: var(--accent);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+
+.secondary-button {
+  padding: 0 14px;
+
+  background: transparent;
+
+  font-size: 12px;
 }
 
 
@@ -208,9 +258,9 @@ button {
 .workspace {
   flex: 1;
 
-  display: flex;
-
   min-height: 0;
+
+  display: flex;
 }
 
 
@@ -220,6 +270,8 @@ button {
 
 .sidebar {
   width: 260px;
+
+  flex-shrink: 0;
 
   display: flex;
   flex-direction: column;
@@ -236,6 +288,8 @@ button {
   align-items: center;
   justify-content: space-between;
 
+  gap: 10px;
+
   padding: 18px;
 }
 
@@ -244,19 +298,19 @@ button {
   color: var(--muted);
 
   font-size: 9px;
-
-  font-weight: 800;
+  font-weight: 850;
 
   letter-spacing: 1px;
 }
 
 
 .project-name {
+  max-width: 160px;
+
   margin-top: 5px;
 
-  max-width: 155px;
-
   overflow: hidden;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 
@@ -267,11 +321,13 @@ button {
 
 .sidebar-title {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
   padding:
-    6px 18px 10px;
+    6px
+    18px
+    10px;
 
   color: var(--muted);
 
@@ -283,8 +339,13 @@ button {
 
 
 .sidebar-title button {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
 
   border: 0;
 
@@ -299,9 +360,14 @@ button {
 .file-list {
   flex: 1;
 
+  min-height: 0;
+
   overflow-y: auto;
 
-  padding: 0 8px 10px;
+  padding:
+    0
+    8px
+    10px;
 }
 
 
@@ -309,12 +375,14 @@ button {
   display: flex;
   align-items: center;
 
-  margin-bottom: 3px;
+  min-width: 0;
 
-  border-radius: 9px;
+  margin-bottom: 3px;
 
   border:
     1px solid transparent;
+
+  border-radius: 9px;
 }
 
 
@@ -324,7 +392,7 @@ button {
   border-color:
     color-mix(
       in srgb,
-      var(--file-color) 55%,
+      var(--file-color) 45%,
       transparent
     );
 }
@@ -353,7 +421,7 @@ button {
 
 
 .file-icon {
-  width: 28px;
+  width: 29px;
 
   flex-shrink: 0;
 
@@ -370,6 +438,7 @@ button {
   min-width: 0;
 
   overflow: hidden;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 
@@ -378,7 +447,11 @@ button {
 
 
 .file-tag {
-  padding: 3px 5px;
+  flex-shrink: 0;
+
+  padding:
+    3px
+    5px;
 
   border-radius: 5px;
 
@@ -397,8 +470,10 @@ button {
 
 
 .delete-file {
-  width: 28px;
-  height: 30px;
+  width: 30px;
+  height: 34px;
+
+  flex-shrink: 0;
 
   border: 0;
 
@@ -414,6 +489,7 @@ button {
 
 .delete-file:hover {
   color: #ff5a5a;
+
   opacity: 1;
 }
 
@@ -429,7 +505,7 @@ button {
 .sidebar-footer button {
   width: 100%;
 
-  padding: 10px;
+  min-height: 38px;
 
   border:
     1px solid var(--border-light);
@@ -445,13 +521,14 @@ button {
 
 
 /* =========================
-   EDITOR
+   EDITOR AREA
 ========================= */
 
 .editor-area {
   flex: 1;
 
   min-width: 0;
+  min-height: 0;
 
   display: flex;
   flex-direction: column;
@@ -460,8 +537,14 @@ button {
 }
 
 
+/* =========================
+   TABS
+========================= */
+
 .tabs {
   height: 43px;
+
+  flex-shrink: 0;
 
   display: flex;
 
@@ -474,8 +557,15 @@ button {
 }
 
 
+.tabs::-webkit-scrollbar {
+  height: 3px;
+}
+
+
 .tab {
   height: 100%;
+
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -499,7 +589,9 @@ button {
 .tab-name {
   height: 100%;
 
-  padding: 0 13px;
+  padding:
+    0
+    12px;
 
   border: 0;
 
@@ -525,90 +617,59 @@ button {
 }
 
 
+/* =========================
+   MONACO EDITOR
+========================= */
+
 .editor-wrapper {
   flex: 1;
 
-  display: flex;
-
+  min-width: 0;
   min-height: 0;
 
-  overflow: hidden;
-}
-
-
-.line-numbers {
-  width: 50px;
-
-  padding:
-    18px 10px;
+  position: relative;
 
   overflow: hidden;
-
-  background: #0d0d0d;
-
-  border-right:
-    1px solid var(--border);
-
-  color: #555;
-
-  text-align: right;
-
-  font-family:
-    "SF Mono",
-    Monaco,
-    Consolas,
-    monospace;
-
-  font-size: 13px;
-
-  line-height: 1.65;
-
-  user-select: none;
-
-  white-space: pre;
 }
 
 
-#editor {
-  flex: 1;
-
-  resize: none;
-
-  padding: 18px;
-
-  border: 0;
-  outline: 0;
-
-  background: #0b0b0b;
-
-  color: #e9e9e9;
-
-  font-family:
-    "SF Mono",
-    Monaco,
-    Consolas,
-    monospace;
-
-  font-size: 14px;
-
-  line-height: 1.65;
-
-  tab-size: 2;
-
-  white-space: pre;
-
-  overflow: auto;
+.editor-wrapper.hidden {
+  display: none;
 }
 
+
+.monaco-editor-container {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Removes ugly outlines on touch */
+
+.monaco-editor,
+.monaco-editor .overflow-guard {
+  outline: none !important;
+}
+
+
+/* =========================
+   STATUS BAR
+========================= */
 
 .statusbar {
   height: 31px;
+
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 12px;
+  gap: 12px;
+
+  padding:
+    0
+    12px;
 
   border-top:
     1px solid var(--border);
@@ -618,14 +679,15 @@ button {
   color: var(--muted);
 
   font-size: 10px;
-
-  flex-shrink: 0;
 }
 
 
 .status-right {
   display: flex;
+
   gap: 15px;
+
+  white-space: nowrap;
 }
 
 
@@ -642,13 +704,13 @@ button {
   align-items: center;
   justify-content: center;
 
+  padding: 30px;
+
   text-align: center;
 }
 
 
-.empty-state.hidden,
-.editor-wrapper.hidden,
-.modal-overlay.hidden {
+.empty-state.hidden {
   display: none;
 }
 
@@ -683,7 +745,9 @@ button {
 
 .empty-state p {
   margin:
-    8px 0 18px;
+    8px
+    0
+    18px;
 
   color: var(--muted);
 
@@ -709,18 +773,20 @@ button {
   padding: 20px;
 
   background:
-    rgba(0, 0, 0, .72);
+    rgba(0, 0, 0, .74);
 
   backdrop-filter:
-    blur(8px);
+    blur(9px);
+}
+
+
+.modal-overlay.hidden {
+  display: none;
 }
 
 
 .modal {
-  width: min(
-    620px,
-    100%
-  );
+  width: min(650px, 100%);
 
   max-height: 85vh;
 
@@ -737,7 +803,7 @@ button {
 
   box-shadow:
     0 20px 80px
-    rgba(0, 0, 0, .6);
+    rgba(0, 0, 0, .65);
 }
 
 
@@ -750,7 +816,9 @@ button {
 
 .modal p {
   margin:
-    8px 0 16px;
+    8px
+    0
+    16px;
 
   color: var(--muted);
 
@@ -792,22 +860,6 @@ button {
 }
 
 
-.secondary-button {
-  min-height: 36px;
-
-  padding: 0 14px;
-
-  border:
-    1px solid var(--border-light);
-
-  border-radius: 9px;
-
-  background: transparent;
-
-  color: var(--text);
-}
-
-
 /* =========================
    FILE TYPE PICKER
 ========================= */
@@ -816,10 +868,7 @@ button {
   display: grid;
 
   grid-template-columns:
-    repeat(
-      2,
-      minmax(0, 1fr)
-    );
+    repeat(2, minmax(0, 1fr));
 
   gap: 8px;
 
@@ -832,7 +881,7 @@ button {
 
 
 .file-type-choice {
-  min-height: 48px;
+  min-height: 50px;
 
   display: flex;
   align-items: center;
@@ -878,15 +927,15 @@ button {
 
 
 .choice-icon {
-  width: 30px;
-  height: 28px;
+  width: 32px;
+  height: 29px;
 
   flex-shrink: 0;
 
   display: grid;
   place-items: center;
 
-  border-radius: 6px;
+  border-radius: 7px;
 
   background:
     color-mix(
@@ -895,8 +944,7 @@ button {
       transparent
     );
 
-  color:
-    var(--choice-color);
+  color: var(--choice-color);
 
   font-size: 9px;
   font-weight: 900;
@@ -914,11 +962,10 @@ button {
 
 
 .choice-extension {
-  color:
-    var(--choice-color);
+  color: var(--choice-color);
 
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 850;
 }
 
 
@@ -926,14 +973,13 @@ button {
    MOBILE / IPAD
 ========================= */
 
-@media (
-  max-width: 700px
-) {
+@media (max-width: 700px) {
 
   .topbar {
     height: 60px;
 
-    padding: 0 10px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
 
@@ -954,42 +1000,24 @@ button {
 
   .sidebar-title {
     padding:
-      6px 13px 9px;
+      6px
+      13px
+      9px;
   }
 
 
-  #editor {
-    font-size: 13px;
-
-    padding: 14px;
-  }
-
-
-  .line-numbers {
-    width: 42px;
-
-    padding:
-      14px 7px;
-
-    font-size: 12px;
+  .file-list {
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
 }
 
 
-@media (
-  max-width: 520px
-) {
-
-  .workspace {
-    position: relative;
-  }
-
+@media (max-width: 520px) {
 
   .sidebar {
     width: 145px;
-
-    flex-shrink: 0;
   }
 
 
@@ -998,10 +1026,19 @@ button {
   }
 
 
-  .small-button {
-    padding: 6px;
+  .top-actions {
+    gap: 4px;
+  }
 
-    font-size: 9px;
+
+  .top-actions .icon-button {
+    width: 32px;
+    height: 32px;
+  }
+
+
+  #exportProjectButton {
+    display: none;
   }
 
 
@@ -1011,8 +1048,7 @@ button {
 
 
   .file-type-picker {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
 
     max-height: 350px;
   }
@@ -1020,6 +1056,11 @@ button {
 
   .modal {
     padding: 17px;
+  }
+
+
+  .status-right {
+    gap: 8px;
   }
 
 }
