@@ -264,6 +264,55 @@ const FALLBACK_TYPE = {
 
 
 /* =========================
+   MIME TYPES
+========================= */
+
+const MIME_TYPES = {
+
+  html: "text/html",
+  htm: "text/html",
+
+  css: "text/css",
+
+  js: "text/javascript",
+  mjs: "text/javascript",
+
+  ts: "text/plain",
+
+  json: "application/json",
+
+  md: "text/markdown",
+
+  txt: "text/plain",
+
+  py: "text/x-python",
+
+  java: "text/x-java-source",
+
+  c: "text/x-c",
+
+  cpp: "text/x-c++src",
+
+  cc: "text/x-c++src",
+
+  cxx: "text/x-c++src",
+
+  cs: "text/plain",
+
+  php: "application/x-httpd-php",
+
+  sql: "application/sql",
+
+  xml: "application/xml",
+
+  yaml: "text/yaml",
+
+  yml: "text/yaml"
+
+};
+
+
+/* =========================
    PROJECT
 ========================= */
 
@@ -323,6 +372,19 @@ function getFileType(filename) {
 }
 
 
+function getMimeType(filename) {
+
+  const extension =
+    getExtension(filename);
+
+  return (
+    MIME_TYPES[extension] ||
+    "application/octet-stream"
+  );
+
+}
+
+
 function getActiveFile() {
 
   return project.files.find(
@@ -342,64 +404,6 @@ function escapeHtml(text) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-
-}
-
-
-/* =========================
-   MIME TYPES
-========================= */
-
-function getMimeType(filename) {
-
-  const extension =
-    getExtension(filename);
-
-
-  const mimeTypes = {
-
-    html: "text/html",
-    htm: "text/html",
-
-    css: "text/css",
-
-    js: "text/javascript",
-    mjs: "text/javascript",
-
-    ts: "text/plain",
-
-    json: "application/json",
-
-    md: "text/markdown",
-
-    txt: "text/plain",
-
-    py: "text/x-python",
-
-    java: "text/x-java-source",
-
-    c: "text/x-c",
-
-    cpp: "text/x-c++src",
-
-    cs: "text/plain",
-
-    php: "application/x-httpd-php",
-
-    sql: "application/sql",
-
-    xml: "application/xml",
-
-    yaml: "application/x-yaml",
-    yml: "application/x-yaml"
-
-  };
-
-
-  return (
-    mimeTypes[extension] ||
-    "text/plain"
-  );
 
 }
 
@@ -1535,74 +1539,7 @@ fileInput.addEventListener(
 
 
 /* =========================
-   EXPORT HELPERS
-========================= */
-
-function downloadFile(file) {
-
-  const mimeType =
-    getMimeType(
-      file.name
-    );
-
-
-  const blob =
-    new Blob(
-      [file.content],
-      {
-        type:
-          mimeType +
-          ";charset=utf-8"
-      }
-    );
-
-
-  const url =
-    URL.createObjectURL(blob);
-
-
-  const link =
-    document.createElement("a");
-
-
-  link.href =
-    url;
-
-
-  link.download =
-    file.name;
-
-
-  link.style.display =
-    "none";
-
-
-  document.body.appendChild(
-    link
-  );
-
-
-  link.click();
-
-
-  setTimeout(
-    () => {
-
-      link.remove();
-
-      URL.revokeObjectURL(
-        url
-      );
-
-    },
-    1000
-  );
-
-}
-
-
-/* =========================
-   EXPORT CURRENT FILE
+   EXPORT FILE
 ========================= */
 
 function exportCurrentFile() {
@@ -1622,7 +1559,56 @@ function exportCurrentFile() {
   }
 
 
-  downloadFile(file);
+  const mimeType =
+    getMimeType(file.name);
+
+
+  const blob =
+    new Blob(
+      [file.content],
+      {
+        type: mimeType
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const link =
+    document.createElement("a");
+
+
+  link.href = url;
+
+
+  /* Keep the exact filename,
+     including its extension */
+
+  link.download =
+    file.name;
+
+
+  link.style.display =
+    "none";
+
+
+  document.body.appendChild(link);
+
+  link.click();
+
+
+  setTimeout(
+    () => {
+
+      URL.revokeObjectURL(url);
+
+      link.remove();
+
+    },
+    1000
+  );
 
 }
 
@@ -1633,43 +1619,68 @@ function exportCurrentFile() {
 
 function exportProject() {
 
-  if (
-    project.files.length === 0
-  ) {
+  const exportData = {
+    name: project.name,
 
-    alert(
-      "This project has no files to export."
+    files:
+      project.files.map(
+        file => ({
+          name: file.name,
+          content: file.content
+        })
+      )
+  };
+
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          exportData,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
     );
 
-    return;
 
-  }
-
-
-  const shouldExport =
-    confirm(
-      `Export ${project.files.length} file(s)?`
-    );
+  const url =
+    URL.createObjectURL(blob);
 
 
-  if (!shouldExport) {
-    return;
-  }
+  const link =
+    document.createElement("a");
 
 
-  project.files.forEach(
-    (file, index) => {
+  link.href = url;
 
-      setTimeout(
-        () => {
 
-          downloadFile(file);
+  link.download =
+    `${project.name}.json`;
 
-        },
-        index * 500
-      );
 
-    }
+  link.style.display =
+    "none";
+
+
+  document.body.appendChild(link);
+
+  link.click();
+
+
+  setTimeout(
+    () => {
+
+      URL.revokeObjectURL(url);
+
+      link.remove();
+
+    },
+    1000
   );
 
 }
