@@ -1,99 +1,38 @@
 /*
   ============================
-  CodePad v2
-  Dark Edition
+  CodePad v3
+  Starter Workspace Edition
   ============================
 */
 
+const STORAGE_KEY = "codepad-project-v3";
 
-const STORAGE_KEY =
-  "codepad-project-v2";
+const fileList = document.getElementById("fileList");
+const tabs = document.getElementById("tabs");
+const editor = document.getElementById("editor");
+const lineNumbers = document.getElementById("lineNumbers");
+const editorWrapper = document.getElementById("editorWrapper");
+const emptyState = document.getElementById("emptyState");
+const projectNameElement = document.getElementById("projectName");
+const fileStatus = document.getElementById("fileStatus");
+const languageStatus = document.getElementById("languageStatus");
+const cursorStatus = document.getElementById("cursorStatus");
+const fileInput = document.getElementById("fileInput");
 
+const modalOverlay = document.getElementById("modalOverlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalText = document.getElementById("modalText");
+const modalInput = document.getElementById("modalInput");
+const modalConfirm = document.getElementById("modalConfirm");
+const modalCancel = document.getElementById("modalCancel");
 
-const fileList =
-  document.getElementById("fileList");
-
-const tabs =
-  document.getElementById("tabs");
-
-const editor =
-  document.getElementById("editor");
-
-const lineNumbers =
-  document.getElementById("lineNumbers");
-
-const editorWrapper =
-  document.getElementById("editorWrapper");
-
-const emptyState =
-  document.getElementById("emptyState");
-
-const projectNameElement =
-  document.getElementById("projectName");
-
-const fileStatus =
-  document.getElementById("fileStatus");
-
-const languageStatus =
-  document.getElementById("languageStatus");
-
-const cursorStatus =
-  document.getElementById("cursorStatus");
-
-const fileInput =
-  document.getElementById("fileInput");
-
-const modalOverlay =
-  document.getElementById("modalOverlay");
-
-const modalTitle =
-  document.getElementById("modalTitle");
-
-const modalText =
-  document.getElementById("modalText");
-
-const modalInput =
-  document.getElementById("modalInput");
-
-const modalConfirm =
-  document.getElementById("modalConfirm");
-
-const modalCancel =
-  document.getElementById("modalCancel");
-
-const searchPanel =
-  document.getElementById("searchPanel");
-
-const searchInput =
-  document.getElementById("searchInput");
-
-const searchCount =
-  document.getElementById("searchCount");
-
-
-let project = {
-
-  name:
-    "Untitled Project",
-
-  files:
-    [],
-
-  activeFileId:
-    null,
-
-  openTabs:
-    []
-
-};
-
-
-let modalAction =
-  null;
+const searchPanel = document.getElementById("searchPanel");
+const searchInput = document.getElementById("searchInput");
+const searchCount = document.getElementById("searchCount");
 
 
 /* ============================
-   FILE TYPE COLORS
+   FILE TYPES
 ============================ */
 
 const FILE_TYPES = {
@@ -102,203 +41,204 @@ const FILE_TYPES = {
     language: "HTML",
     tag: "HTML",
     icon: "</>",
-    color: "#f97316"
-  },
+    color: "#ef4444",
+    defaultName: "index",
+    starter: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>My Project</title>
+</head>
+<body>
 
-  htm: {
-    language: "HTML",
-    tag: "HTML",
-    icon: "</>",
-    color: "#f97316"
+  <h1>Hello World</h1>
+
+</body>
+</html>`
   },
 
   css: {
     language: "CSS",
     tag: "CSS",
     icon: "{}",
-    color: "#3b82f6"
+    color: "#3b82f6",
+    defaultName: "style",
+    starter: `* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}`
   },
 
   js: {
     language: "JavaScript",
     tag: "JS",
     icon: "JS",
-    color: "#facc15"
-  },
-
-  jsx: {
-    language: "JavaScript / JSX",
-    tag: "JSX",
-    icon: "JS",
-    color: "#facc15"
-  },
-
-  ts: {
-    language: "TypeScript",
-    tag: "TS",
-    icon: "TS",
-    color: "#3178c6"
-  },
-
-  tsx: {
-    language: "TypeScript / TSX",
-    tag: "TSX",
-    icon: "TS",
-    color: "#3178c6"
+    color: "#facc15",
+    defaultName: "app",
+    starter: `console.log("Hello from CodePad!");`
   },
 
   py: {
     language: "Python",
     tag: "PY",
     icon: "PY",
-    color: "#22c55e"
+    color: "#22c55e",
+    defaultName: "main",
+    starter: `print("Hello from CodePad!")`
   },
 
-  java: {
-    language: "Java",
-    tag: "JAVA",
-    icon: "J",
-    color: "#fb923c"
-  },
+  md: {
+    language: "Markdown",
+    tag: "README",
+    icon: "MD",
+    color: "#f97316",
+    defaultName: "README",
+    starter: `# My Project
 
-  c: {
-    language: "C",
-    tag: "C",
-    icon: "C",
-    color: "#06b6d4"
-  },
+Made with CodePad.
 
-  h: {
-    language: "C Header",
-    tag: "H",
-    icon: "H",
-    color: "#06b6d4"
-  },
+## About
 
-  cpp: {
-    language: "C++",
-    tag: "C++",
-    icon: "C+",
-    color: "#3b82f6"
-  },
-
-  cc: {
-    language: "C++",
-    tag: "C++",
-    icon: "C+",
-    color: "#3b82f6"
-  },
-
-  cs: {
-    language: "C#",
-    tag: "C#",
-    icon: "C#",
-    color: "#a855f7"
+Write your project description here.
+`
   },
 
   json: {
     language: "JSON",
     tag: "JSON",
     icon: "{}",
-    color: "#a855f7"
-  },
-
-  md: {
-    language: "Markdown",
-    tag: "MD",
-    icon: "M↓",
-    color: "#ec4899"
-  },
-
-  txt: {
-    language: "Plain Text",
-    tag: "TXT",
-    icon: "TXT",
-    color: "#a1a1aa"
-  },
-
-  xml: {
-    language: "XML",
-    tag: "XML",
-    icon: "</>",
-    color: "#f43f5e"
+    color: "#a855f7",
+    defaultName: "data",
+    starter: `{
+  "name": "My Project"
+}`
   },
 
   yaml: {
     language: "YAML",
     tag: "YAML",
     icon: "Y",
-    color: "#eab308"
+    color: "#ec4899",
+    defaultName: "config",
+    starter: `name: My Project`
   },
 
-  yml: {
-    language: "YAML",
-    tag: "YAML",
-    icon: "Y",
-    color: "#eab308"
+  java: {
+    language: "Java",
+    tag: "JAVA",
+    icon: "J",
+    color: "#fb7185",
+    defaultName: "Main",
+    starter: `public class Main {
+
+  public static void main(String[] args) {
+
+    System.out.println("Hello World");
+
+  }
+
+}`
+  },
+
+  cpp: {
+    language: "C++",
+    tag: "C++",
+    icon: "C+",
+    color: "#06b6d4",
+    defaultName: "main",
+    starter: `#include <iostream>
+
+int main() {
+
+  std::cout << "Hello World";
+
+  return 0;
+
+}`
+  },
+
+  c: {
+    language: "C",
+    tag: "C",
+    icon: "C",
+    color: "#14b8a6",
+    defaultName: "main",
+    starter: `#include <stdio.h>
+
+int main() {
+
+  printf("Hello World");
+
+  return 0;
+
+}`
+  },
+
+  cs: {
+    language: "C#",
+    tag: "C#",
+    icon: "C#",
+    color: "#8b5cf6",
+    defaultName: "Program",
+    starter: `Console.WriteLine("Hello World!");`
+  },
+
+  ts: {
+    language: "TypeScript",
+    tag: "TS",
+    icon: "TS",
+    color: "#2563eb",
+    defaultName: "app",
+    starter: `console.log("Hello from TypeScript!");`
   },
 
   php: {
     language: "PHP",
     tag: "PHP",
     icon: "PHP",
-    color: "#818cf8"
-  },
+    color: "#818cf8",
+    defaultName: "index",
+    starter: `<?php
 
-  rb: {
-    language: "Ruby",
-    tag: "RB",
-    icon: "RB",
-    color: "#ef4444"
-  },
+echo "Hello World";
 
-  go: {
-    language: "Go",
-    tag: "GO",
-    icon: "GO",
-    color: "#22d3ee"
-  },
-
-  rs: {
-    language: "Rust",
-    tag: "RS",
-    icon: "RS",
-    color: "#f97316"
+?>`
   },
 
   sql: {
     language: "SQL",
     tag: "SQL",
     icon: "SQL",
-    color: "#38bdf8"
+    color: "#38bdf8",
+    defaultName: "database",
+    starter: `SELECT * FROM table_name;`
   },
 
-  sh: {
-    language: "Shell",
-    tag: "SH",
-    icon: "$_",
-    color: "#22c55e"
+  xml: {
+    language: "XML",
+    tag: "XML",
+    icon: "</>",
+    color: "#f43f5e",
+    defaultName: "data",
+    starter: `<?xml version="1.0"?>
+
+<root>
+
+</root>`
   },
 
-  bat: {
-    language: "Batch",
-    tag: "BAT",
-    icon: ">_",
-    color: "#a1a1aa"
-  },
-
-  ini: {
-    language: "Config",
-    tag: "INI",
-    icon: "⚙",
-    color: "#14b8a6"
-  },
-
-  toml: {
-    language: "TOML",
-    tag: "TOML",
-    icon: "T",
-    color: "#f59e0b"
+  txt: {
+    language: "Plain Text",
+    tag: "TXT",
+    icon: "TXT",
+    color: "#a1a1aa",
+    defaultName: "notes",
+    starter: ``
   }
 
 };
@@ -306,19 +246,108 @@ const FILE_TYPES = {
 
 const DEFAULT_FILE_TYPE = {
 
-  language:
-    "Plain Text",
-
-  tag:
-    "TEXT",
-
-  icon:
-    "•",
-
-  color:
-    "#a1a1aa"
+  language: "Plain Text",
+  tag: "TEXT",
+  icon: "•",
+  color: "#a1a1aa"
 
 };
+
+
+/* ============================
+   PROJECT
+============================ */
+
+let project = {
+
+  name: "My Project",
+
+  files: [],
+
+  activeFileId: null,
+
+  openTabs: []
+
+};
+
+
+let modalAction = null;
+
+
+/* ============================
+   STARTER FILES
+============================ */
+
+function createStarterProject() {
+
+  const starterFiles = [
+
+    {
+      extension: "html",
+      name: "index.html"
+    },
+
+    {
+      extension: "css",
+      name: "style.css"
+    },
+
+    {
+      extension: "js",
+      name: "app.js"
+    },
+
+    {
+      extension: "md",
+      name: "README.md"
+    },
+
+    {
+      extension: "py",
+      name: "main.py"
+    },
+
+    {
+      extension: "json",
+      name: "data.json"
+    },
+
+    {
+      extension: "yaml",
+      name: "config.yaml"
+    }
+
+  ];
+
+
+  project.files = starterFiles.map(item => {
+
+    const type = FILE_TYPES[item.extension];
+
+    return {
+
+      id: createId(),
+
+      name: item.name,
+
+      content: type.starter
+
+    };
+
+  });
+
+
+  project.activeFileId =
+    project.files[0].id;
+
+
+  project.openTabs = [
+
+    project.files[0].id
+
+  ];
+
+}
 
 
 /* ============================
@@ -337,23 +366,18 @@ function saveProject() {
 
 function loadProject() {
 
-  const v2 =
-    localStorage.getItem(
-      STORAGE_KEY
-    );
-
-
-  const old =
-    localStorage.getItem(
-      "codepad-project-v1"
-    );
-
-
   const saved =
-    v2 || old;
+
+    localStorage.getItem(STORAGE_KEY) ||
+
+    localStorage.getItem("codepad-project-v2") ||
+
+    localStorage.getItem("codepad-project-v1");
 
 
   if (!saved) {
+
+    createStarterProject();
 
     return;
 
@@ -362,15 +386,13 @@ function loadProject() {
 
   try {
 
-    project =
-      JSON.parse(saved);
+    project = JSON.parse(saved);
 
   }
+
   catch {
 
-    console.log(
-      "Could not load project."
-    );
+    createStarterProject();
 
   }
 
@@ -384,10 +406,13 @@ function loadProject() {
 function createId() {
 
   return (
+
     Date.now().toString(36) +
+
     Math.random()
       .toString(36)
       .slice(2)
+
   );
 
 }
@@ -396,9 +421,12 @@ function createId() {
 function getActiveFile() {
 
   return project.files.find(
+
     file =>
+
       file.id ===
       project.activeFileId
+
   );
 
 }
@@ -410,9 +438,7 @@ function getExtension(filename) {
     filename.split(".");
 
 
-  if (
-    parts.length < 2
-  ) {
+  if (parts.length < 2) {
 
     return "";
 
@@ -433,15 +459,18 @@ function getFileType(filename) {
 
 
   return (
+
     FILE_TYPES[extension] ||
+
     DEFAULT_FILE_TYPE
+
   );
 
 }
 
 
 /* ============================
-   DYNAMIC ACCENT
+   ACCENT
 ============================ */
 
 function updateAccent() {
@@ -461,32 +490,18 @@ function updateAccent() {
       "#ffffff"
     );
 
-
-    root.style.setProperty(
-      "--accent-text",
-      "#09090b"
-    );
-
     return;
 
   }
 
 
   const type =
-    getFileType(
-      file.name
-    );
+    getFileType(file.name);
 
 
   root.style.setProperty(
     "--accent",
     type.color
-  );
-
-
-  root.style.setProperty(
-    "--accent-text",
-    "#09090b"
   );
 
 }
@@ -498,24 +513,17 @@ function updateAccent() {
 
 function renderFileList() {
 
-  fileList.innerHTML =
-    "";
+  fileList.innerHTML = "";
 
 
-  for (
-    const file of project.files
-  ) {
+  for (const file of project.files) {
 
     const type =
-      getFileType(
-        file.name
-      );
+      getFileType(file.name);
 
 
     const item =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
 
     item.className =
@@ -529,21 +537,19 @@ function renderFileList() {
 
 
     if (
+
       file.id ===
       project.activeFileId
+
     ) {
 
-      item.classList.add(
-        "active"
-      );
+      item.classList.add("active");
 
     }
 
 
     const main =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
 
     main.className =
@@ -569,28 +575,19 @@ function renderFileList() {
 
     main.addEventListener(
       "click",
-      () => {
-
-        openFile(
-          file.id
-        );
-
-      }
+      () => openFile(file.id)
     );
 
 
     const deleteButton =
-      document.createElement(
-        "button"
-      );
+      document.createElement("button");
 
 
     deleteButton.className =
       "delete-file";
 
 
-    deleteButton.textContent =
-      "×";
+    deleteButton.textContent = "×";
 
 
     deleteButton.addEventListener(
@@ -599,9 +596,7 @@ function renderFileList() {
 
         event.stopPropagation();
 
-        deleteFile(
-          file.id
-        );
+        deleteFile(file.id);
 
       }
     );
@@ -609,14 +604,9 @@ function renderFileList() {
 
     item.appendChild(main);
 
-    item.appendChild(
-      deleteButton
-    );
+    item.appendChild(deleteButton);
 
-
-    fileList.appendChild(
-      item
-    );
+    fileList.appendChild(item);
 
   }
 
@@ -629,42 +619,31 @@ function renderFileList() {
 
 function renderTabs() {
 
-  tabs.innerHTML =
-    "";
+  tabs.innerHTML = "";
 
 
-  for (
-    const id of project.openTabs
-  ) {
+  for (const id of project.openTabs) {
 
     const file =
       project.files.find(
-        item =>
-          item.id === id
+
+        item => item.id === id
+
       );
 
 
-    if (!file) {
-
-      continue;
-
-    }
+    if (!file) continue;
 
 
     const type =
-      getFileType(
-        file.name
-      );
+      getFileType(file.name);
 
 
     const tab =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
 
-    tab.className =
-      "tab";
+    tab.className = "tab";
 
 
     tab.style.setProperty(
@@ -674,21 +653,19 @@ function renderTabs() {
 
 
     if (
+
       file.id ===
       project.activeFileId
+
     ) {
 
-      tab.classList.add(
-        "active"
-      );
+      tab.classList.add("active");
 
     }
 
 
     const name =
-      document.createElement(
-        "span"
-      );
+      document.createElement("span");
 
 
     name.textContent =
@@ -697,28 +674,19 @@ function renderTabs() {
 
     name.addEventListener(
       "click",
-      () => {
-
-        openFile(
-          file.id
-        );
-
-      }
+      () => openFile(file.id)
     );
 
 
     const close =
-      document.createElement(
-        "button"
-      );
+      document.createElement("button");
 
 
     close.className =
       "tab-close";
 
 
-    close.textContent =
-      "×";
+    close.textContent = "×";
 
 
     close.addEventListener(
@@ -727,9 +695,7 @@ function renderTabs() {
 
         event.stopPropagation();
 
-        closeTab(
-          file.id
-        );
+        closeTab(file.id);
 
       }
     );
@@ -754,29 +720,25 @@ function openFile(id) {
 
   const file =
     project.files.find(
-      item =>
-        item.id === id
+
+      item => item.id === id
+
     );
 
 
-  if (!file) {
-
-    return;
-
-  }
+  if (!file) return;
 
 
-  project.activeFileId =
-    id;
+  project.activeFileId = id;
 
 
   if (
+
     !project.openTabs.includes(id)
+
   ) {
 
-    project.openTabs.push(
-      id
-    );
+    project.openTabs.push(id);
 
   }
 
@@ -814,13 +776,7 @@ function closeTab(id) {
     project.openTabs.indexOf(id);
 
 
-  if (
-    index === -1
-  ) {
-
-    return;
-
-  }
+  if (index === -1) return;
 
 
   project.openTabs.splice(
@@ -830,38 +786,28 @@ function closeTab(id) {
 
 
   if (
+
     project.activeFileId === id
+
   ) {
 
-    const nextId =
+    project.activeFileId =
+
       project.openTabs[index] ||
+
       project.openTabs[index - 1] ||
+
       null;
 
 
-    project.activeFileId =
-      nextId;
+    const nextFile =
+      getActiveFile();
 
 
-    if (nextId) {
-
-      const file =
-        project.files.find(
-          item =>
-            item.id === nextId
-        );
-
-
-      editor.value =
-        file.content;
-
-    }
-    else {
-
-      editor.value =
-        "";
-
-    }
+    editor.value =
+      nextFile
+        ? nextFile.content
+        : "";
 
   }
 
@@ -878,37 +824,34 @@ function closeTab(id) {
 
   updateEditorVisibility();
 
-  updateCursorStatus();
-
   saveProject();
 
 }
 
 
 /* ============================
-   DELETE FILE
+   DELETE
 ============================ */
 
 function deleteFile(id) {
 
   const file =
     project.files.find(
-      item =>
-        item.id === id
+
+      item => item.id === id
+
     );
 
 
-  if (!file) {
-
-    return;
-
-  }
+  if (!file) return;
 
 
   if (
+
     !confirm(
       `Delete "${file.name}"?`
     )
+
   ) {
 
     return;
@@ -918,57 +861,58 @@ function deleteFile(id) {
 
   project.files =
     project.files.filter(
-      item =>
-        item.id !== id
+
+      item => item.id !== id
+
     );
 
 
   project.openTabs =
     project.openTabs.filter(
-      item =>
-        item !== id
+
+      item => item !== id
+
     );
 
 
   if (
+
     project.activeFileId === id
+
   ) {
 
     project.activeFileId =
+
       project.openTabs[0] ||
+
+      project.files[0]?.id ||
+
       null;
 
   }
 
 
-  if (
-    project.activeFileId
-  ) {
+  const active =
+    getActiveFile();
 
-    openFile(
-      project.activeFileId
-    );
 
-  }
-  else {
+  editor.value =
+    active
+      ? active.content
+      : "";
 
-    editor.value =
-      "";
 
-    updateLineNumbers();
+  updateLineNumbers();
 
-    updateStatus();
+  updateStatus();
 
-    updateAccent();
+  updateAccent();
 
-    updateEditorVisibility();
+  renderTabs();
 
-    renderTabs();
+  renderFileList();
 
-    renderFileList();
-
-  }
-
+  updateEditorVisibility();
 
   saveProject();
 
@@ -987,18 +931,20 @@ function updateLineNumbers() {
       .length;
 
 
-  let numbers =
-    "";
+  let numbers = "";
 
 
   for (
+
     let i = 1;
+
     i <= lines;
+
     i++
+
   ) {
 
-    numbers +=
-      i + "\n";
+    numbers += i + "\n";
 
   }
 
@@ -1020,7 +966,6 @@ function updateStatus() {
     fileStatus.textContent =
       "No file open";
 
-
     languageStatus.textContent =
       "Plain Text";
 
@@ -1030,9 +975,7 @@ function updateStatus() {
 
 
   const type =
-    getFileType(
-      file.name
-    );
+    getFileType(file.name);
 
 
   fileStatus.textContent =
@@ -1049,8 +992,11 @@ function updateCursorStatus() {
 
   const beforeCursor =
     editor.value.slice(
+
       0,
+
       editor.selectionStart
+
     );
 
 
@@ -1063,6 +1009,7 @@ function updateCursorStatus() {
 
 
   const column =
+
     lines[
       lines.length - 1
     ].length + 1;
@@ -1080,30 +1027,16 @@ function updateEditorVisibility() {
     !!getActiveFile();
 
 
-  if (hasFile) {
-
-    emptyState.classList.add(
-      "hidden"
-    );
-
-
-    editorWrapper.classList.remove(
-      "hidden"
-    );
-
-  }
-  else {
-
-    emptyState.classList.remove(
-      "hidden"
-    );
+  emptyState.classList.toggle(
+    "hidden",
+    hasFile
+  );
 
 
-    editorWrapper.classList.add(
-      "hidden"
-    );
-
-  }
+  editorWrapper.classList.toggle(
+    "hidden",
+    !hasFile
+  );
 
 }
 
@@ -1116,11 +1049,7 @@ editor.addEventListener(
       getActiveFile();
 
 
-    if (!file) {
-
-      return;
-
-    }
+    if (!file) return;
 
 
     file.content =
@@ -1160,14 +1089,18 @@ editor.addEventListener(
 );
 
 
-/* TAB KEY + SHORTCUTS */
+/* ============================
+   KEYBOARD
+============================ */
 
 editor.addEventListener(
   "keydown",
   event => {
 
     if (
+
       event.key === "Tab"
+
     ) {
 
       event.preventDefault();
@@ -1182,18 +1115,18 @@ editor.addEventListener(
 
 
       editor.value =
-        editor.value.substring(
-          0,
-          start
-        ) +
+
+        editor.value.substring(0, start) +
+
         "  " +
-        editor.value.substring(
-          end
-        );
+
+        editor.value.substring(end);
 
 
       editor.selectionStart =
+
         editor.selectionEnd =
+
           start + 2;
 
 
@@ -1205,11 +1138,11 @@ editor.addEventListener(
 
 
     if (
-      (
-        event.ctrlKey ||
-        event.metaKey
-      ) &&
+
+      (event.ctrlKey || event.metaKey) &&
+
       event.key.toLowerCase() === "s"
+
     ) {
 
       event.preventDefault();
@@ -1220,11 +1153,11 @@ editor.addEventListener(
 
 
     if (
-      (
-        event.ctrlKey ||
-        event.metaKey
-      ) &&
+
+      (event.ctrlKey || event.metaKey) &&
+
       event.key.toLowerCase() === "f"
+
     ) {
 
       event.preventDefault();
@@ -1249,43 +1182,30 @@ function openModal(
   action
 ) {
 
-  modalTitle.textContent =
-    title;
+  modalTitle.textContent = title;
 
+  modalText.textContent = text;
 
-  modalText.textContent =
-    text;
-
-
-  modalInput.value =
-    "";
-
+  modalInput.value = "";
 
   modalInput.placeholder =
     placeholder;
 
-
   modalConfirm.textContent =
     confirmText;
 
-
-  modalAction =
-    action;
-
+  modalAction = action;
 
   modalOverlay.classList.remove(
     "hidden"
   );
 
 
-  setTimeout(
-    () => {
+  setTimeout(() => {
 
-      modalInput.focus();
+    modalInput.focus();
 
-    },
-    50
-  );
+  }, 50);
 
 }
 
@@ -1296,9 +1216,7 @@ function closeModal() {
     "hidden"
   );
 
-
-  modalAction =
-    null;
+  modalAction = null;
 
 }
 
@@ -1311,11 +1229,7 @@ modalConfirm.addEventListener(
       modalInput.value.trim();
 
 
-    if (!value) {
-
-      return;
-
-    }
+    if (!value) return;
 
 
     if (modalAction) {
@@ -1337,51 +1251,201 @@ modalCancel.addEventListener(
 );
 
 
-modalInput.addEventListener(
-  "keydown",
-  event => {
-
-    if (
-      event.key === "Enter"
-    ) {
-
-      modalConfirm.click();
-
-    }
-
-  }
-);
-
-
 /* ============================
-   NEW FILE
+   NEW FILE TYPE PICKER
 ============================ */
 
 function createNewFile() {
 
-  openModal(
+  const choices = Object.keys(FILE_TYPES)
+    .map(extension => {
 
-    "New File",
+      const type =
+        FILE_TYPES[extension];
 
-    "Choose any filename and extension.",
 
-    "index.html",
+      return `
+        <button
+          class="file-type-choice"
+          data-extension="${extension}"
+          style="--choice-color:${type.color}"
+        >
+          <span class="choice-icon">
+            ${escapeHtml(type.icon)}
+          </span>
 
-    "Create",
+          <span>
+            ${escapeHtml(type.language)}
+          </span>
 
-    filename => {
+          <span class="choice-extension">
+            .${extension}
+          </span>
+        </button>
+      `;
+
+    })
+    .join("");
+
+
+  modalTitle.textContent =
+    "New File";
+
+
+  modalText.textContent =
+    "Choose what kind of file you want to create.";
+
+
+  modalInput.style.display =
+    "none";
+
+
+  modalConfirm.style.display =
+    "none";
+
+
+  const oldPicker =
+    document.getElementById(
+      "fileTypePicker"
+    );
+
+
+  if (oldPicker) {
+
+    oldPicker.remove();
+
+  }
+
+
+  const picker =
+    document.createElement("div");
+
+
+  picker.id =
+    "fileTypePicker";
+
+
+  picker.className =
+    "file-type-picker";
+
+
+  picker.innerHTML =
+    choices;
+
+
+  modalText.after(picker);
+
+
+  modalOverlay.classList.remove(
+    "hidden"
+  );
+
+
+  picker
+    .querySelectorAll(
+      ".file-type-choice"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const extension =
+            button.dataset.extension;
+
+
+          chooseFileName(
+            extension
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+function chooseFileName(extension) {
+
+  const picker =
+    document.getElementById(
+      "fileTypePicker"
+    );
+
+
+  if (picker) {
+
+    picker.remove();
+
+  }
+
+
+  const type =
+    FILE_TYPES[extension];
+
+
+  modalTitle.textContent =
+    `New ${type.language} File`;
+
+
+  modalText.textContent =
+    `Choose a filename for your .${extension} file.`;
+
+
+  modalInput.style.display =
+    "block";
+
+
+  modalInput.value =
+    type.defaultName;
+
+
+  modalConfirm.style.display =
+    "inline-block";
+
+
+  modalConfirm.textContent =
+    "Create";
+
+
+  modalAction =
+    baseName => {
+
+      let filename =
+        baseName;
+
+
+      if (
+
+        !filename
+          .toLowerCase()
+          .endsWith(
+            "." + extension
+          )
+
+      ) {
+
+        filename +=
+          "." + extension;
+
+      }
+
 
       const exists =
         project.files.some(
+
           file =>
             file.name === filename
+
         );
 
 
       if (exists) {
 
         alert(
-          "A file with that name already exists."
+          "That file already exists."
         );
 
         return;
@@ -1391,36 +1455,35 @@ function createNewFile() {
 
       const file = {
 
-        id:
-          createId(),
+        id: createId(),
 
-        name:
-          filename,
+        name: filename,
 
-        content:
-          ""
+        content: type.starter
 
       };
 
 
-      project.files.push(
-        file
-      );
+      project.files.push(file);
+
+      openFile(file.id);
+
+    };
 
 
-      openFile(
-        file.id
-      );
+  setTimeout(() => {
 
-    }
+    modalInput.focus();
 
-  );
+    modalInput.select();
+
+  }, 50);
 
 }
 
 
 /* ============================
-   RENAME PROJECT
+   PROJECT NAME
 ============================ */
 
 function renameProject() {
@@ -1437,13 +1500,10 @@ function renameProject() {
 
     name => {
 
-      project.name =
-        name;
-
+      project.name = name;
 
       projectNameElement.textContent =
         name;
-
 
       saveProject();
 
@@ -1460,8 +1520,7 @@ function renameProject() {
 
 function importFiles() {
 
-  fileInput.value =
-    "";
+  fileInput.value = "";
 
   fileInput.click();
 
@@ -1473,14 +1532,10 @@ fileInput.addEventListener(
   async () => {
 
     const files =
-      Array.from(
-        fileInput.files
-      );
+      Array.from(fileInput.files);
 
 
-    for (
-      const imported of files
-    ) {
+    for (const imported of files) {
 
       try {
 
@@ -1488,68 +1543,18 @@ fileInput.addEventListener(
           await imported.text();
 
 
-        let name =
-          imported.name;
-
-
-        if (
-          project.files.some(
-            file =>
-              file.name === name
-          )
-        ) {
-
-          let counter =
-            2;
-
-
-          const extension =
-            name.includes(".")
-              ? "." +
-                name.split(".").pop()
-              : "";
-
-
-          const base =
-            extension
-              ? name.slice(
-                  0,
-                  -extension.length
-                )
-              : name;
-
-
-          while (
-            project.files.some(
-              file =>
-                file.name ===
-                `${base}-${counter}${extension}`
-            )
-          ) {
-
-            counter++;
-
-          }
-
-
-          name =
-            `${base}-${counter}${extension}`;
-
-        }
-
-
         project.files.push({
 
-          id:
-            createId(),
+          id: createId(),
 
-          name,
+          name: imported.name,
 
           content
 
         });
 
       }
+
       catch {
 
         console.log(
@@ -1562,10 +1567,7 @@ fileInput.addEventListener(
     }
 
 
-    if (
-      files.length &&
-      project.files.length
-    ) {
+    if (files.length) {
 
       openFile(
         project.files.at(-1).id
@@ -1583,7 +1585,7 @@ fileInput.addEventListener(
 
 
 /* ============================
-   EXPORT FILE
+   EXPORT
 ============================ */
 
 function exportCurrentFile() {
@@ -1605,104 +1607,67 @@ function exportCurrentFile() {
 
   const blob =
     new Blob(
+
       [file.content],
+
       {
-        type:
-          "text/plain"
+        type: "text/plain"
       }
+
     );
 
 
   const url =
-    URL.createObjectURL(
-      blob
-    );
+    URL.createObjectURL(blob);
 
 
   const link =
-    document.createElement(
-      "a"
-    );
+    document.createElement("a");
 
 
-  link.href =
-    url;
-
+  link.href = url;
 
   link.download =
     file.name;
 
 
-  document.body.appendChild(
-    link
-  );
-
+  document.body.appendChild(link);
 
   link.click();
 
   link.remove();
 
 
-  setTimeout(
-    () => {
-
-      URL.revokeObjectURL(
-        url
-      );
-
-    },
-    1000
-  );
+  URL.revokeObjectURL(url);
 
 }
 
 
-/* ============================
-   EXPORT PROJECT
-============================ */
-
 function exportProject() {
-
-  if (
-    project.files.length === 0
-  ) {
-
-    alert(
-      "There are no files to export."
-    );
-
-    return;
-
-  }
-
 
   const data = {
 
-    project:
-      project.name,
+    project: project.name,
 
     exportedAt:
-      new Date()
-        .toISOString(),
+      new Date().toISOString(),
 
-    files:
-      project.files.map(
-        file => ({
+    files: project.files.map(
+      file => ({
 
-          name:
-            file.name,
+        name: file.name,
 
-          content:
-            file.content
+        content: file.content
 
-        })
-      )
+      })
+    )
 
   };
 
 
   const blob =
     new Blob(
+
       [
         JSON.stringify(
           data,
@@ -1710,60 +1675,36 @@ function exportProject() {
           2
         )
       ],
+
       {
         type:
           "application/json"
       }
+
     );
 
 
   const url =
-    URL.createObjectURL(
-      blob
-    );
+    URL.createObjectURL(blob);
 
 
   const link =
-    document.createElement(
-      "a"
-    );
+    document.createElement("a");
 
 
-  link.href =
-    url;
-
+  link.href = url;
 
   link.download =
-    `${
-      project.name
-        .replace(
-          /[^a-z0-9-_]/gi,
-          "-"
-        ) ||
-      "codepad-project"
-    }.json`;
+    "codepad-project.json";
 
 
-  document.body.appendChild(
-    link
-  );
-
+  document.body.appendChild(link);
 
   link.click();
 
   link.remove();
 
-
-  setTimeout(
-    () => {
-
-      URL.revokeObjectURL(
-        url
-      );
-
-    },
-    1000
-  );
+  URL.revokeObjectURL(url);
 
 }
 
@@ -1774,11 +1715,7 @@ function exportProject() {
 
 function openSearch() {
 
-  if (!getActiveFile()) {
-
-    return;
-
-  }
+  if (!getActiveFile()) return;
 
 
   searchPanel.classList.remove(
@@ -1798,8 +1735,7 @@ function closeSearch() {
   );
 
 
-  searchInput.value =
-    "";
+  searchInput.value = "";
 
 
   searchCount.textContent =
@@ -1824,30 +1760,21 @@ function searchCurrentFile() {
   }
 
 
-  const content =
-    editor.value;
+  let count = 0;
 
-
-  let count =
-    0;
-
-
-  let position =
-    0;
+  let position = 0;
 
 
   while (true) {
 
     position =
-      content.indexOf(
+      editor.value.indexOf(
         query,
         position
       );
 
 
-    if (
-      position === -1
-    ) {
+    if (position === -1) {
 
       break;
 
@@ -1856,57 +1783,17 @@ function searchCurrentFile() {
 
     count++;
 
-    position +=
-      query.length;
+    position += query.length;
 
   }
 
 
   searchCount.textContent =
     `${count} result${
-      count === 1
-        ? ""
-        : "s"
+      count === 1 ? "" : "s"
     }`;
 
-
-  const first =
-    content.indexOf(
-      query
-    );
-
-
-  if (
-    first !== -1
-  ) {
-
-    editor.focus();
-
-
-    editor.setSelectionRange(
-      first,
-      first + query.length
-    );
-
-  }
-
 }
-
-
-searchInput.addEventListener(
-  "input",
-  searchCurrentFile
-);
-
-
-document
-  .getElementById(
-    "closeSearchButton"
-  )
-  .addEventListener(
-    "click",
-    closeSearch
-  );
 
 
 /* ============================
@@ -1914,9 +1801,7 @@ document
 ============================ */
 
 document
-  .getElementById(
-    "newFileButton"
-  )
+  .getElementById("newFileButton")
   .addEventListener(
     "click",
     createNewFile
@@ -1924,9 +1809,7 @@ document
 
 
 document
-  .getElementById(
-    "addFileButton"
-  )
+  .getElementById("addFileButton")
   .addEventListener(
     "click",
     createNewFile
@@ -1934,9 +1817,7 @@ document
 
 
 document
-  .getElementById(
-    "emptyNewFileButton"
-  )
+  .getElementById("emptyNewFileButton")
   .addEventListener(
     "click",
     createNewFile
@@ -1944,9 +1825,7 @@ document
 
 
 document
-  .getElementById(
-    "importButton"
-  )
+  .getElementById("importButton")
   .addEventListener(
     "click",
     importFiles
@@ -1954,9 +1833,7 @@ document
 
 
 document
-  .getElementById(
-    "exportButton"
-  )
+  .getElementById("exportButton")
   .addEventListener(
     "click",
     exportCurrentFile
@@ -1964,9 +1841,7 @@ document
 
 
 document
-  .getElementById(
-    "exportProjectButton"
-  )
+  .getElementById("exportProjectButton")
   .addEventListener(
     "click",
     exportProject
@@ -1974,42 +1849,38 @@ document
 
 
 document
-  .getElementById(
-    "renameProjectButton"
-  )
+  .getElementById("renameProjectButton")
   .addEventListener(
     "click",
     renameProject
   );
 
 
+document
+  .getElementById("closeSearchButton")
+  .addEventListener(
+    "click",
+    closeSearch
+  );
+
+
 /* ============================
-   HTML ESCAPING
+   ESCAPE HTML
 ============================ */
 
 function escapeHtml(text) {
 
   return String(text)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
+
+    .replaceAll("&", "&amp;")
+
+    .replaceAll("<", "&lt;")
+
+    .replaceAll(">", "&gt;")
+
+    .replaceAll('"', "&quot;")
+
+    .replaceAll("'", "&#039;");
 
 }
 
@@ -2020,9 +1891,20 @@ function escapeHtml(text) {
 
 loadProject();
 
-
 projectNameElement.textContent =
   project.name;
+
+
+const active =
+  getActiveFile();
+
+
+if (active) {
+
+  editor.value =
+    active.content;
+
+}
 
 
 renderFileList();
@@ -2038,3 +1920,5 @@ updateStatus();
 updateCursorStatus();
 
 updateAccent();
+
+saveProject();
