@@ -1,16 +1,14 @@
 /*
   ============================
-  CodePad
-  Local browser code editor
+  CodePad v2
+  Dark Edition
   ============================
 */
 
 
 const STORAGE_KEY =
-  "codepad-project-v1";
+  "codepad-project-v2";
 
-
-/* ELEMENTS */
 
 const fileList =
   document.getElementById("fileList");
@@ -73,16 +71,6 @@ const searchCount =
   document.getElementById("searchCount");
 
 
-/*
-  PROJECT STATE
-
-  Every file has:
-
-  id
-  name
-  content
-*/
-
 let project = {
 
   name:
@@ -105,6 +93,235 @@ let modalAction =
 
 
 /* ============================
+   FILE TYPE COLORS
+============================ */
+
+const FILE_TYPES = {
+
+  html: {
+    language: "HTML",
+    tag: "HTML",
+    icon: "</>",
+    color: "#f97316"
+  },
+
+  htm: {
+    language: "HTML",
+    tag: "HTML",
+    icon: "</>",
+    color: "#f97316"
+  },
+
+  css: {
+    language: "CSS",
+    tag: "CSS",
+    icon: "{}",
+    color: "#3b82f6"
+  },
+
+  js: {
+    language: "JavaScript",
+    tag: "JS",
+    icon: "JS",
+    color: "#facc15"
+  },
+
+  jsx: {
+    language: "JavaScript / JSX",
+    tag: "JSX",
+    icon: "JS",
+    color: "#facc15"
+  },
+
+  ts: {
+    language: "TypeScript",
+    tag: "TS",
+    icon: "TS",
+    color: "#3178c6"
+  },
+
+  tsx: {
+    language: "TypeScript / TSX",
+    tag: "TSX",
+    icon: "TS",
+    color: "#3178c6"
+  },
+
+  py: {
+    language: "Python",
+    tag: "PY",
+    icon: "PY",
+    color: "#22c55e"
+  },
+
+  java: {
+    language: "Java",
+    tag: "JAVA",
+    icon: "J",
+    color: "#fb923c"
+  },
+
+  c: {
+    language: "C",
+    tag: "C",
+    icon: "C",
+    color: "#06b6d4"
+  },
+
+  h: {
+    language: "C Header",
+    tag: "H",
+    icon: "H",
+    color: "#06b6d4"
+  },
+
+  cpp: {
+    language: "C++",
+    tag: "C++",
+    icon: "C+",
+    color: "#3b82f6"
+  },
+
+  cc: {
+    language: "C++",
+    tag: "C++",
+    icon: "C+",
+    color: "#3b82f6"
+  },
+
+  cs: {
+    language: "C#",
+    tag: "C#",
+    icon: "C#",
+    color: "#a855f7"
+  },
+
+  json: {
+    language: "JSON",
+    tag: "JSON",
+    icon: "{}",
+    color: "#a855f7"
+  },
+
+  md: {
+    language: "Markdown",
+    tag: "MD",
+    icon: "M↓",
+    color: "#ec4899"
+  },
+
+  txt: {
+    language: "Plain Text",
+    tag: "TXT",
+    icon: "TXT",
+    color: "#a1a1aa"
+  },
+
+  xml: {
+    language: "XML",
+    tag: "XML",
+    icon: "</>",
+    color: "#f43f5e"
+  },
+
+  yaml: {
+    language: "YAML",
+    tag: "YAML",
+    icon: "Y",
+    color: "#eab308"
+  },
+
+  yml: {
+    language: "YAML",
+    tag: "YAML",
+    icon: "Y",
+    color: "#eab308"
+  },
+
+  php: {
+    language: "PHP",
+    tag: "PHP",
+    icon: "PHP",
+    color: "#818cf8"
+  },
+
+  rb: {
+    language: "Ruby",
+    tag: "RB",
+    icon: "RB",
+    color: "#ef4444"
+  },
+
+  go: {
+    language: "Go",
+    tag: "GO",
+    icon: "GO",
+    color: "#22d3ee"
+  },
+
+  rs: {
+    language: "Rust",
+    tag: "RS",
+    icon: "RS",
+    color: "#f97316"
+  },
+
+  sql: {
+    language: "SQL",
+    tag: "SQL",
+    icon: "SQL",
+    color: "#38bdf8"
+  },
+
+  sh: {
+    language: "Shell",
+    tag: "SH",
+    icon: "$_",
+    color: "#22c55e"
+  },
+
+  bat: {
+    language: "Batch",
+    tag: "BAT",
+    icon: ">_",
+    color: "#a1a1aa"
+  },
+
+  ini: {
+    language: "Config",
+    tag: "INI",
+    icon: "⚙",
+    color: "#14b8a6"
+  },
+
+  toml: {
+    language: "TOML",
+    tag: "TOML",
+    icon: "T",
+    color: "#f59e0b"
+  }
+
+};
+
+
+const DEFAULT_FILE_TYPE = {
+
+  language:
+    "Plain Text",
+
+  tag:
+    "TEXT",
+
+  icon:
+    "•",
+
+  color:
+    "#a1a1aa"
+
+};
+
+
+/* ============================
    LOAD / SAVE
 ============================ */
 
@@ -120,10 +337,20 @@ function saveProject() {
 
 function loadProject() {
 
-  const saved =
+  const v2 =
     localStorage.getItem(
       STORAGE_KEY
     );
+
+
+  const old =
+    localStorage.getItem(
+      "codepad-project-v1"
+    );
+
+
+  const saved =
+    v2 || old;
 
 
   if (!saved) {
@@ -141,8 +368,8 @@ function loadProject() {
   }
   catch {
 
-    localStorage.removeItem(
-      STORAGE_KEY
+    console.log(
+      "Could not load project."
     );
 
   }
@@ -157,8 +384,7 @@ function loadProject() {
 function createId() {
 
   return (
-    Date.now()
-      .toString(36) +
+    Date.now().toString(36) +
     Math.random()
       .toString(36)
       .slice(2)
@@ -200,159 +426,74 @@ function getExtension(filename) {
 }
 
 
-function getLanguage(filename) {
+function getFileType(filename) {
 
-  const ext =
+  const extension =
     getExtension(filename);
 
 
-  const languages = {
-
-    html:
-      "HTML",
-
-    htm:
-      "HTML",
-
-    css:
-      "CSS",
-
-    js:
-      "JavaScript",
-
-    jsx:
-      "JavaScript / JSX",
-
-    ts:
-      "TypeScript",
-
-    tsx:
-      "TypeScript / TSX",
-
-    json:
-      "JSON",
-
-    md:
-      "Markdown",
-
-    txt:
-      "Plain Text",
-
-    py:
-      "Python",
-
-    java:
-      "Java",
-
-    c:
-      "C",
-
-    h:
-      "C Header",
-
-    cpp:
-      "C++",
-
-    cc:
-      "C++",
-
-    cs:
-      "C#",
-
-    php:
-      "PHP",
-
-    rb:
-      "Ruby",
-
-    go:
-      "Go",
-
-    rs:
-      "Rust",
-
-    sql:
-      "SQL",
-
-    xml:
-      "XML",
-
-    yml:
-      "YAML",
-
-    yaml:
-      "YAML",
-
-    sh:
-      "Shell",
-
-    bat:
-      "Batch",
-
-    ini:
-      "Config",
-
-    toml:
-      "TOML"
-
-  };
-
-
   return (
-    languages[ext] ||
-    "Plain Text"
-  );
-
-}
-
-
-function getFileIcon(filename) {
-
-  const ext =
-    getExtension(filename);
-
-
-  const icons = {
-
-    html: "🌐",
-    htm: "🌐",
-
-    css: "🎨",
-
-    js: "JS",
-    jsx: "JS",
-
-    ts: "TS",
-    tsx: "TS",
-
-    json: "{}",
-
-    md: "M↓",
-
-    py: "PY",
-
-    java: "☕",
-
-    c: "C",
-    h: "H",
-
-    cpp: "C++",
-
-    txt: "TXT"
-
-  };
-
-
-  return (
-    icons[ext] ||
-    "•"
+    FILE_TYPES[extension] ||
+    DEFAULT_FILE_TYPE
   );
 
 }
 
 
 /* ============================
-   RENDER FILE LIST
+   DYNAMIC ACCENT
+============================ */
+
+function updateAccent() {
+
+  const file =
+    getActiveFile();
+
+
+  const root =
+    document.documentElement;
+
+
+  if (!file) {
+
+    root.style.setProperty(
+      "--accent",
+      "#ffffff"
+    );
+
+
+    root.style.setProperty(
+      "--accent-text",
+      "#09090b"
+    );
+
+    return;
+
+  }
+
+
+  const type =
+    getFileType(
+      file.name
+    );
+
+
+  root.style.setProperty(
+    "--accent",
+    type.color
+  );
+
+
+  root.style.setProperty(
+    "--accent-text",
+    "#09090b"
+  );
+
+}
+
+
+/* ============================
+   FILE LIST
 ============================ */
 
 function renderFileList() {
@@ -365,12 +506,26 @@ function renderFileList() {
     const file of project.files
   ) {
 
+    const type =
+      getFileType(
+        file.name
+      );
+
+
     const item =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
 
     item.className =
       "file-item";
+
+
+    item.style.setProperty(
+      "--file-color",
+      type.color
+    );
 
 
     if (
@@ -386,7 +541,9 @@ function renderFileList() {
 
 
     const main =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
 
     main.className =
@@ -396,11 +553,15 @@ function renderFileList() {
     main.innerHTML = `
 
       <span class="file-icon">
-        ${getFileIcon(file.name)}
+        ${escapeHtml(type.icon)}
       </span>
 
       <span class="file-name">
         ${escapeHtml(file.name)}
+      </span>
+
+      <span class="file-tag">
+        ${escapeHtml(type.tag)}
       </span>
 
     `;
@@ -419,7 +580,9 @@ function renderFileList() {
 
 
     const deleteButton =
-      document.createElement("button");
+      document.createElement(
+        "button"
+      );
 
 
     deleteButton.className =
@@ -436,7 +599,6 @@ function renderFileList() {
 
         event.stopPropagation();
 
-
         deleteFile(
           file.id
         );
@@ -445,10 +607,7 @@ function renderFileList() {
     );
 
 
-    item.appendChild(
-      main
-    );
-
+    item.appendChild(main);
 
     item.appendChild(
       deleteButton
@@ -492,12 +651,26 @@ function renderTabs() {
     }
 
 
+    const type =
+      getFileType(
+        file.name
+      );
+
+
     const tab =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
 
     tab.className =
       "tab";
+
+
+    tab.style.setProperty(
+      "--file-color",
+      type.color
+    );
 
 
     if (
@@ -513,7 +686,9 @@ function renderTabs() {
 
 
     const name =
-      document.createElement("span");
+      document.createElement(
+        "span"
+      );
 
 
     name.textContent =
@@ -533,7 +708,9 @@ function renderTabs() {
 
 
     const close =
-      document.createElement("button");
+      document.createElement(
+        "button"
+      );
 
 
     close.className =
@@ -549,7 +726,6 @@ function renderTabs() {
       event => {
 
         event.stopPropagation();
-
 
         closeTab(
           file.id
@@ -598,7 +774,9 @@ function openFile(id) {
     !project.openTabs.includes(id)
   ) {
 
-    project.openTabs.push(id);
+    project.openTabs.push(
+      id
+    );
 
   }
 
@@ -611,11 +789,15 @@ function openFile(id) {
 
   updateStatus();
 
+  updateAccent();
+
   renderFileList();
 
   renderTabs();
 
   updateEditorVisibility();
+
+  updateCursorStatus();
 
   saveProject();
 
@@ -652,12 +834,8 @@ function closeTab(id) {
   ) {
 
     const nextId =
-      project.openTabs[
-        index
-      ] ||
-      project.openTabs[
-        index - 1
-      ] ||
+      project.openTabs[index] ||
+      project.openTabs[index - 1] ||
       null;
 
 
@@ -680,7 +858,8 @@ function closeTab(id) {
     }
     else {
 
-      editor.value = "";
+      editor.value =
+        "";
 
     }
 
@@ -691,11 +870,15 @@ function closeTab(id) {
 
   updateStatus();
 
+  updateAccent();
+
   renderTabs();
 
   renderFileList();
 
   updateEditorVisibility();
+
+  updateCursorStatus();
 
   saveProject();
 
@@ -722,13 +905,11 @@ function deleteFile(id) {
   }
 
 
-  const confirmed =
-    confirm(
+  if (
+    !confirm(
       `Delete "${file.name}"?`
-    );
-
-
-  if (!confirmed) {
+    )
+  ) {
 
     return;
 
@@ -771,9 +952,14 @@ function deleteFile(id) {
   }
   else {
 
-    editor.value = "";
+    editor.value =
+      "";
 
     updateLineNumbers();
+
+    updateStatus();
+
+    updateAccent();
 
     updateEditorVisibility();
 
@@ -838,10 +1024,15 @@ function updateStatus() {
     languageStatus.textContent =
       "Plain Text";
 
-
     return;
 
   }
+
+
+  const type =
+    getFileType(
+      file.name
+    );
 
 
   fileStatus.textContent =
@@ -849,9 +1040,7 @@ function updateStatus() {
 
 
   languageStatus.textContent =
-    getLanguage(
-      file.name
-    );
+    type.language;
 
 }
 
@@ -960,7 +1149,18 @@ editor.addEventListener(
 );
 
 
-/* TAB KEY */
+editor.addEventListener(
+  "scroll",
+  () => {
+
+    lineNumbers.scrollTop =
+      editor.scrollTop;
+
+  }
+);
+
+
+/* TAB KEY + SHORTCUTS */
 
 editor.addEventListener(
   "keydown",
@@ -1004,11 +1204,6 @@ editor.addEventListener(
     }
 
 
-    /*
-      Ctrl/Cmd + S
-      Export current file
-    */
-
     if (
       (
         event.ctrlKey ||
@@ -1024,11 +1219,6 @@ editor.addEventListener(
     }
 
 
-    /*
-      Ctrl/Cmd + F
-      Search
-    */
-
     if (
       (
         event.ctrlKey ||
@@ -1042,17 +1232,6 @@ editor.addEventListener(
       openSearch();
 
     }
-
-  }
-);
-
-
-editor.addEventListener(
-  "scroll",
-  () => {
-
-    lineNumbers.scrollTop =
-      editor.scrollTop;
 
   }
 );
@@ -1100,7 +1279,11 @@ function openModal(
 
 
   setTimeout(
-    () => modalInput.focus(),
+    () => {
+
+      modalInput.focus();
+
+    },
     50
   );
 
@@ -1128,18 +1311,14 @@ modalConfirm.addEventListener(
       modalInput.value.trim();
 
 
-    if (
-      !value
-    ) {
+    if (!value) {
 
       return;
 
     }
 
 
-    if (
-      modalAction
-    ) {
+    if (modalAction) {
 
       modalAction(value);
 
@@ -1175,7 +1354,7 @@ modalInput.addEventListener(
 
 
 /* ============================
-   CREATE FILE
+   NEW FILE
 ============================ */
 
 function createNewFile() {
@@ -1192,16 +1371,14 @@ function createNewFile() {
 
     filename => {
 
-      const alreadyExists =
+      const exists =
         project.files.some(
           file =>
             file.name === filename
         );
 
 
-      if (
-        alreadyExists
-      ) {
+      if (exists) {
 
         alert(
           "A file with that name already exists."
@@ -1234,9 +1411,6 @@ function createNewFile() {
       openFile(
         file.id
       );
-
-
-      saveProject();
 
     }
 
@@ -1281,7 +1455,7 @@ function renameProject() {
 
 
 /* ============================
-   IMPORT FILES
+   IMPORT
 ============================ */
 
 function importFiles() {
@@ -1318,10 +1492,6 @@ fileInput.addEventListener(
           imported.name;
 
 
-        /*
-          Avoid duplicate names
-        */
-
         if (
           project.files.some(
             file =>
@@ -1329,7 +1499,9 @@ fileInput.addEventListener(
           )
         ) {
 
-          let counter = 2;
+          let counter =
+            2;
+
 
           const extension =
             name.includes(".")
@@ -1366,7 +1538,7 @@ fileInput.addEventListener(
         }
 
 
-        const file = {
+        project.files.push({
 
           id:
             createId(),
@@ -1375,12 +1547,7 @@ fileInput.addEventListener(
 
           content
 
-        };
-
-
-        project.files.push(
-          file
-        );
+        });
 
       }
       catch {
@@ -1400,12 +1567,8 @@ fileInput.addEventListener(
       project.files.length
     ) {
 
-      const last =
-        project.files.at(-1);
-
-
       openFile(
-        last.id
+        project.files.at(-1).id
       );
 
     }
@@ -1420,7 +1583,7 @@ fileInput.addEventListener(
 
 
 /* ============================
-   EXPORT CURRENT FILE
+   EXPORT FILE
 ============================ */
 
 function exportCurrentFile() {
@@ -1457,7 +1620,9 @@ function exportCurrentFile() {
 
 
   const link =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
 
 
   link.href =
@@ -1475,13 +1640,17 @@ function exportCurrentFile() {
 
   link.click();
 
-
   link.remove();
 
 
   setTimeout(
-    () =>
-      URL.revokeObjectURL(url),
+    () => {
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    },
     1000
   );
 
@@ -1506,14 +1675,6 @@ function exportProject() {
 
   }
 
-
-  /*
-    Browser-only version:
-
-    Creates a project manifest.
-    A later CodePad version can
-    add ZIP export.
-  */
 
   const data = {
 
@@ -1563,7 +1724,9 @@ function exportProject() {
 
 
   const link =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
 
 
   link.href =
@@ -1571,11 +1734,14 @@ function exportProject() {
 
 
   link.download =
-    `${project.name
-      .replace(
-        /[^a-z0-9-_]/gi,
-        "-"
-      ) || "codepad-project"}.json`;
+    `${
+      project.name
+        .replace(
+          /[^a-z0-9-_]/gi,
+          "-"
+        ) ||
+      "codepad-project"
+    }.json`;
 
 
   document.body.appendChild(
@@ -1585,13 +1751,17 @@ function exportProject() {
 
   link.click();
 
-
   link.remove();
 
 
   setTimeout(
-    () =>
-      URL.revokeObjectURL(url),
+    () => {
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    },
     1000
   );
 
@@ -1604,9 +1774,7 @@ function exportProject() {
 
 function openSearch() {
 
-  if (
-    !getActiveFile()
-  ) {
+  if (!getActiveFile()) {
 
     return;
 
@@ -1660,9 +1828,12 @@ function searchCurrentFile() {
     editor.value;
 
 
-  let count = 0;
+  let count =
+    0;
 
-  let position = 0;
+
+  let position =
+    0;
 
 
   while (true) {
@@ -1692,11 +1863,17 @@ function searchCurrentFile() {
 
 
   searchCount.textContent =
-    `${count} result${count === 1 ? "" : "s"}`;
+    `${count} result${
+      count === 1
+        ? ""
+        : "s"
+    }`;
 
 
   const first =
-    content.indexOf(query);
+    content.indexOf(
+      query
+    );
 
 
   if (
@@ -1704,6 +1881,7 @@ function searchCurrentFile() {
   ) {
 
     editor.focus();
+
 
     editor.setSelectionRange(
       first,
@@ -1722,7 +1900,9 @@ searchInput.addEventListener(
 
 
 document
-  .getElementById("closeSearchButton")
+  .getElementById(
+    "closeSearchButton"
+  )
   .addEventListener(
     "click",
     closeSearch
@@ -1734,7 +1914,9 @@ document
 ============================ */
 
 document
-  .getElementById("newFileButton")
+  .getElementById(
+    "newFileButton"
+  )
   .addEventListener(
     "click",
     createNewFile
@@ -1742,7 +1924,9 @@ document
 
 
 document
-  .getElementById("addFileButton")
+  .getElementById(
+    "addFileButton"
+  )
   .addEventListener(
     "click",
     createNewFile
@@ -1750,7 +1934,9 @@ document
 
 
 document
-  .getElementById("emptyNewFileButton")
+  .getElementById(
+    "emptyNewFileButton"
+  )
   .addEventListener(
     "click",
     createNewFile
@@ -1758,7 +1944,9 @@ document
 
 
 document
-  .getElementById("importButton")
+  .getElementById(
+    "importButton"
+  )
   .addEventListener(
     "click",
     importFiles
@@ -1766,7 +1954,9 @@ document
 
 
 document
-  .getElementById("exportButton")
+  .getElementById(
+    "exportButton"
+  )
   .addEventListener(
     "click",
     exportCurrentFile
@@ -1774,7 +1964,9 @@ document
 
 
 document
-  .getElementById("exportProjectButton")
+  .getElementById(
+    "exportProjectButton"
+  )
   .addEventListener(
     "click",
     exportProject
@@ -1782,7 +1974,9 @@ document
 
 
 document
-  .getElementById("renameProjectButton")
+  .getElementById(
+    "renameProjectButton"
+  )
   .addEventListener(
     "click",
     renameProject
@@ -1795,7 +1989,7 @@ document
 
 function escapeHtml(text) {
 
-  return text
+  return String(text)
     .replaceAll(
       "&",
       "&amp;"
@@ -1842,3 +2036,5 @@ updateLineNumbers();
 updateStatus();
 
 updateCursorStatus();
+
+updateAccent();
