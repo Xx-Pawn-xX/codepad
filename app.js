@@ -1,11 +1,24 @@
-const STORAGE_KEY = "codepad-v4";
+const STORAGE_KEY = "codepad-v5";
 
-const fileList = document.getElementById("fileList");
-const tabs = document.getElementById("tabs");
-const editor = document.getElementById("editor");
-const lineNumbers = document.getElementById("lineNumbers");
-const editorWrapper = document.getElementById("editorWrapper");
-const emptyState = document.getElementById("emptyState");
+
+/* =========================
+   DOM
+========================= */
+
+const fileList =
+  document.getElementById("fileList");
+
+const tabs =
+  document.getElementById("tabs");
+
+const editorContainer =
+  document.getElementById("editor");
+
+const editorWrapper =
+  document.getElementById("editorWrapper");
+
+const emptyState =
+  document.getElementById("emptyState");
 
 const projectNameElement =
   document.getElementById("projectName");
@@ -53,14 +66,21 @@ const FILE_TYPES = {
     color: "#ff3b3b",
     icon: "</>",
     defaultName: "index",
+    language: "html",
     content: `<!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>My Project</title>
+
 </head>
 
 <body>
@@ -68,8 +88,10 @@ const FILE_TYPES = {
   <h1>Hello World</h1>
 
 </body>
+
 </html>`
   },
+
 
   css: {
     label: "CSS",
@@ -77,6 +99,7 @@ const FILE_TYPES = {
     color: "#3b82f6",
     icon: "{}",
     defaultName: "style",
+    language: "css",
     content: `* {
   box-sizing: border-box;
 }
@@ -86,14 +109,17 @@ body {
 }`
   },
 
+
   js: {
     label: "JavaScript",
     extension: "js",
     color: "#facc15",
     icon: "JS",
     defaultName: "app",
+    language: "javascript",
     content: `console.log("Hello from CodePad!");`
   },
+
 
   ts: {
     label: "TypeScript",
@@ -101,8 +127,10 @@ body {
     color: "#60a5fa",
     icon: "TS",
     defaultName: "app",
+    language: "typescript",
     content: `console.log("Hello from TypeScript!");`
   },
+
 
   md: {
     label: "Markdown",
@@ -110,6 +138,7 @@ body {
     color: "#f97316",
     icon: "MD",
     defaultName: "README",
+    language: "markdown",
     content: `# My Project
 
 Made with CodePad.
@@ -120,14 +149,17 @@ Write something about your project here.
 `
   },
 
+
   py: {
     label: "Python",
     extension: "py",
     color: "#22c55e",
     icon: "PY",
     defaultName: "main",
+    language: "python",
     content: `print("Hello World!")`
   },
+
 
   json: {
     label: "JSON",
@@ -135,10 +167,12 @@ Write something about your project here.
     color: "#a855f7",
     icon: "{}",
     defaultName: "data",
+    language: "json",
     content: `{
   "name": "My Project"
 }`
   },
+
 
   yaml: {
     label: "YAML",
@@ -146,8 +180,21 @@ Write something about your project here.
     color: "#ec4899",
     icon: "YML",
     defaultName: "config",
+    language: "yaml",
     content: `name: My Project`
   },
+
+
+  yml: {
+    label: "YAML",
+    extension: "yml",
+    color: "#ec4899",
+    icon: "YML",
+    defaultName: "config",
+    language: "yaml",
+    content: `name: My Project`
+  },
+
 
   java: {
     label: "Java",
@@ -155,6 +202,7 @@ Write something about your project here.
     color: "#fb7185",
     icon: "J",
     defaultName: "Main",
+    language: "java",
     content: `public class Main {
 
   public static void main(String[] args) {
@@ -166,12 +214,14 @@ Write something about your project here.
 }`
   },
 
+
   cpp: {
     label: "C++",
     extension: "cpp",
     color: "#06b6d4",
     icon: "C+",
     defaultName: "main",
+    language: "cpp",
     content: `#include <iostream>
 
 int main() {
@@ -183,12 +233,14 @@ int main() {
 }`
   },
 
+
   c: {
     label: "C",
     extension: "c",
     color: "#14b8a6",
     icon: "C",
     defaultName: "main",
+    language: "c",
     content: `#include <stdio.h>
 
 int main() {
@@ -200,14 +252,17 @@ int main() {
 }`
   },
 
+
   cs: {
     label: "C#",
     extension: "cs",
     color: "#8b5cf6",
     icon: "C#",
     defaultName: "Program",
+    language: "csharp",
     content: `Console.WriteLine("Hello World!");`
   },
+
 
   php: {
     label: "PHP",
@@ -215,6 +270,7 @@ int main() {
     color: "#818cf8",
     icon: "PHP",
     defaultName: "index",
+    language: "php",
     content: `<?php
 
 echo "Hello World!";
@@ -222,14 +278,17 @@ echo "Hello World!";
 ?>`
   },
 
+
   sql: {
     label: "SQL",
     extension: "sql",
     color: "#38bdf8",
     icon: "SQL",
     defaultName: "database",
+    language: "sql",
     content: `SELECT * FROM table_name;`
   },
+
 
   xml: {
     label: "XML",
@@ -237,6 +296,7 @@ echo "Hello World!";
     color: "#f43f5e",
     icon: "</>",
     defaultName: "data",
+    language: "xml",
     content: `<?xml version="1.0"?>
 
 <root>
@@ -244,12 +304,14 @@ echo "Hello World!";
 </root>`
   },
 
+
   txt: {
     label: "Text",
     extension: "txt",
     color: "#a1a1aa",
     icon: "TXT",
     defaultName: "notes",
+    language: "plaintext",
     content: ``
   }
 
@@ -259,7 +321,8 @@ echo "Hello World!";
 const FALLBACK_TYPE = {
   label: "Text",
   color: "#a1a1aa",
-  icon: "TXT"
+  icon: "TXT",
+  language: "plaintext"
 };
 
 
@@ -276,6 +339,12 @@ let project = {
 
 
 let selectedType = null;
+
+let editor = null;
+
+let currentModel = null;
+
+let monacoReady = false;
 
 
 /* =========================
@@ -359,16 +428,7 @@ function createStarterProject() {
     "md",
     "py",
     "json",
-    "yaml",
-    "ts",
-    "java",
-    "cpp",
-    "c",
-    "cs",
-    "php",
-    "sql",
-    "xml",
-    "txt"
+    "yaml"
   ];
 
 
@@ -515,25 +575,17 @@ function renderFileList() {
 
 
     openButton.innerHTML = `
-
-      <span
-        class="file-icon"
-      >
+      <span class="file-icon">
         ${escapeHtml(type.icon)}
       </span>
 
-      <span
-        class="file-name"
-      >
+      <span class="file-name">
         ${escapeHtml(file.name)}
       </span>
 
-      <span
-        class="file-tag"
-      >
+      <span class="file-tag">
         ${escapeHtml(type.label)}
       </span>
-
     `;
 
 
@@ -591,7 +643,8 @@ function renderTabs() {
 
     const file =
       project.files.find(
-        item => item.id === id
+        item =>
+          item.id === id
       );
 
 
@@ -687,7 +740,8 @@ function openFile(id) {
 
   const file =
     project.files.find(
-      item => item.id === id
+      item =>
+        item.id === id
     );
 
 
@@ -707,13 +761,70 @@ function openFile(id) {
   }
 
 
-  editor.value =
-    file.content;
-
+  loadFileIntoEditor();
 
   updateEverything();
 
   saveProject();
+
+}
+
+
+/* =========================
+   LOAD FILE INTO MONACO
+========================= */
+
+function loadFileIntoEditor() {
+
+  if (
+    !editor ||
+    !monacoReady
+  ) {
+    return;
+  }
+
+
+  const file =
+    getActiveFile();
+
+
+  if (!file) {
+
+    editor.setModel(null);
+
+    currentModel = null;
+
+    return;
+
+  }
+
+
+  const type =
+    getFileType(file.name);
+
+
+  if (currentModel) {
+
+    currentModel.dispose();
+
+    currentModel = null;
+
+  }
+
+
+  currentModel =
+    monaco.editor.createModel(
+      file.content,
+      type.language
+    );
+
+
+  editor.setModel(
+    currentModel
+  );
+
+
+  editor.focus();
 
 }
 
@@ -726,7 +837,8 @@ function closeTab(id) {
 
   project.openTabs =
     project.openTabs.filter(
-      tabId => tabId !== id
+      tabId =>
+        tabId !== id
     );
 
 
@@ -742,15 +854,7 @@ function closeTab(id) {
   }
 
 
-  const active =
-    getActiveFile();
-
-
-  editor.value =
-    active
-      ? active.content
-      : "";
-
+  loadFileIntoEditor();
 
   updateEverything();
 
@@ -767,7 +871,8 @@ function deleteFile(id) {
 
   const file =
     project.files.find(
-      item => item.id === id
+      item =>
+        item.id === id
     );
 
 
@@ -785,13 +890,15 @@ function deleteFile(id) {
 
   project.files =
     project.files.filter(
-      item => item.id !== id
+      item =>
+        item.id !== id
     );
 
 
   project.openTabs =
     project.openTabs.filter(
-      item => item !== id
+      item =>
+        item !== id
     );
 
 
@@ -806,15 +913,7 @@ function deleteFile(id) {
   }
 
 
-  const active =
-    getActiveFile();
-
-
-  editor.value =
-    active
-      ? active.content
-      : "";
-
+  loadFileIntoEditor();
 
   updateEverything();
 
@@ -824,157 +923,431 @@ function deleteFile(id) {
 
 
 /* =========================
-   EDITOR
+   MONACO
 ========================= */
 
-editor.addEventListener(
-  "input",
-  () => {
+function initializeMonaco() {
 
-    const file =
-      getActiveFile();
-
-
-    if (!file) return;
-
-
-    file.content =
-      editor.value;
+  require.config({
+    paths: {
+      vs:
+        "https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs"
+    }
+  });
 
 
-    updateLineNumbers();
+  window.MonacoEnvironment = {
 
-    updateCursor();
+    getWorkerUrl() {
 
-    saveProject();
+      const workerCode = `
+        self.MonacoEnvironment = {
+          baseUrl:
+            "https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/"
+        };
 
-  }
-);
-
-
-editor.addEventListener(
-  "scroll",
-  () => {
-
-    lineNumbers.scrollTop =
-      editor.scrollTop;
-
-  }
-);
+        importScripts(
+          "https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/base/worker/workerMain.js"
+        );
+      `;
 
 
-editor.addEventListener(
-  "click",
-  updateCursor
-);
-
-
-editor.addEventListener(
-  "keyup",
-  updateCursor
-);
-
-
-editor.addEventListener(
-  "keydown",
-  event => {
-
-    if (event.key === "Tab") {
-
-      event.preventDefault();
-
-
-      const start =
-        editor.selectionStart;
-
-      const end =
-        editor.selectionEnd;
-
-
-      editor.value =
-        editor.value.substring(
-          0,
-          start
-        ) +
-
-        "  " +
-
-        editor.value.substring(
-          end
+      const blob =
+        new Blob(
+          [workerCode],
+          {
+            type:
+              "text/javascript"
+          }
         );
 
 
-      editor.selectionStart =
-        start + 2;
-
-      editor.selectionEnd =
-        start + 2;
-
-
-      editor.dispatchEvent(
-        new Event("input")
+      return URL.createObjectURL(
+        blob
       );
 
     }
 
+  };
 
-    if (
-      (event.ctrlKey || event.metaKey) &&
-      event.key.toLowerCase() === "s"
-    ) {
 
-      event.preventDefault();
+  require(
+    [
+      "vs/editor/editor.main"
+    ],
 
-      exportCurrentFile();
+    function () {
+
+      monacoReady = true;
+
+
+      /* =========================
+         CUSTOM CODEPAD THEME
+      ========================== */
+
+      monaco.editor.defineTheme(
+        "codepad-dark",
+
+        {
+          base: "vs-dark",
+
+          inherit: true,
+
+          rules: [
+
+            {
+              token: "comment",
+              foreground: "6A9955"
+            },
+
+            {
+              token: "keyword",
+              foreground: "C586C0"
+            },
+
+            {
+              token: "string",
+              foreground: "CE9178"
+            },
+
+            {
+              token: "number",
+              foreground: "B5CEA8"
+            },
+
+            {
+              token: "type",
+              foreground: "4EC9B0"
+            },
+
+            {
+              token: "function",
+              foreground: "DCDCAA"
+            },
+
+            {
+              token: "variable",
+              foreground: "9CDCFE"
+            },
+
+            {
+              token: "tag",
+              foreground: "569CD6"
+            },
+
+            {
+              token: "attribute.name",
+              foreground: "9CDCFE"
+            }
+
+          ],
+
+          colors: {
+
+            "editor.background":
+              "#0B0B0B",
+
+            "editor.foreground":
+              "#E9E9E9",
+
+            "editorLineNumber.foreground":
+              "#505050",
+
+            "editorLineNumber.activeForeground":
+              "#A0A0A0",
+
+            "editorCursor.foreground":
+              "#FFFFFF",
+
+            "editor.selectionBackground":
+              "#264F78",
+
+            "editor.inactiveSelectionBackground":
+              "#1C3A5C",
+
+            "editor.lineHighlightBackground":
+              "#101010",
+
+            "editorIndentGuide.background":
+              "#202020",
+
+            "editorIndentGuide.activeBackground":
+              "#3A3A3A",
+
+            "editorBracketMatch.background":
+              "#2B2B2B",
+
+            "editorBracketMatch.border":
+              "#666666",
+
+            "editorWidget.background":
+              "#171717",
+
+            "editorWidget.border":
+              "#333333",
+
+            "editorSuggestWidget.background":
+              "#171717",
+
+            "editorSuggestWidget.border":
+              "#333333",
+
+            "editorSuggestWidget.selectedBackground":
+              "#262626",
+
+            "editorHoverWidget.background":
+              "#171717",
+
+            "editorHoverWidget.border":
+              "#333333",
+
+            "editorGutter.background":
+              "#0B0B0B"
+
+          }
+
+        }
+
+      );
+
+
+      monaco.editor.setTheme(
+        "codepad-dark"
+      );
+
+
+      editor =
+        monaco.editor.create(
+
+          editorContainer,
+
+          {
+
+            value: "",
+
+            language:
+              "plaintext",
+
+            theme:
+              "codepad-dark",
+
+            automaticLayout:
+              true,
+
+            fontSize:
+              14,
+
+            lineHeight:
+              22,
+
+            fontFamily:
+              'SFMono-Regular, Consolas, "Liberation Mono", monospace',
+
+            tabSize:
+              2,
+
+            insertSpaces:
+              true,
+
+            minimap: {
+              enabled: false
+            },
+
+            scrollBeyondLastLine:
+              false,
+
+            smoothScrolling:
+              true,
+
+            cursorSmoothCaretAnimation:
+              "on",
+
+            cursorBlinking:
+              "smooth",
+
+            roundedSelection:
+              true,
+
+            wordWrap:
+              "on",
+
+            wrappingIndent:
+              "same",
+
+            automaticLayout:
+              true,
+
+            suggest: {
+
+              showKeywords:
+                true,
+
+              showSnippets:
+                true,
+
+              showMethods:
+                true,
+
+              showFunctions:
+                true,
+
+              showConstructors:
+                true,
+
+              showFields:
+                true,
+
+              showVariables:
+                true,
+
+              showClasses:
+                true,
+
+              showInterfaces:
+                true,
+
+              showModules:
+                true,
+
+              showProperties:
+                true
+
+            },
+
+            quickSuggestions: {
+
+              other:
+                true,
+
+              comments:
+                false,
+
+              strings:
+                false
+
+            },
+
+            suggestOnTriggerCharacters:
+              true,
+
+            acceptSuggestionOnEnter:
+              "on",
+
+            acceptSuggestionOnCommitCharacter:
+              true,
+
+            parameterHints: {
+              enabled:
+                true
+            },
+
+            autoClosingBrackets:
+              "always",
+
+            autoClosingQuotes:
+              "always",
+
+            autoSurround:
+              "languageDefined",
+
+            bracketPairColorization: {
+              enabled:
+                true
+            },
+
+            guides: {
+
+              bracketPairs:
+                true,
+
+              indentation:
+                true
+
+            },
+
+            formatOnPaste:
+              true,
+
+            formatOnType:
+              true,
+
+            folding:
+              true,
+
+            lineNumbers:
+              "on",
+
+            glyphMargin:
+              false,
+
+            contextmenu:
+              true,
+
+            renderWhitespace:
+              "selection",
+
+            padding: {
+              top: 16,
+              bottom: 16
+            }
+
+          }
+
+        );
+
+
+      /* =========================
+         SAVE CHANGES
+      ========================== */
+
+      editor.onDidChangeModelContent(
+        () => {
+
+          const file =
+            getActiveFile();
+
+
+          if (!file) return;
+
+
+          file.content =
+            editor.getValue();
+
+
+          saveProject();
+
+        }
+      );
+
+
+      /* =========================
+         CURSOR STATUS
+      ========================== */
+
+      editor.onDidChangeCursorPosition(
+        event => {
+
+          cursorStatus.textContent =
+            `Ln ${event.position.lineNumber}, Col ${event.position.column}`;
+
+        }
+      );
+
+
+      loadFileIntoEditor();
+
+      updateEverything();
 
     }
 
-  }
-);
+  );
+
+}
 
 
 /* =========================
    STATUS
 ========================= */
-
-function updateLineNumbers() {
-
-  const count =
-    editor.value
-      .split("\n")
-      .length;
-
-
-  lineNumbers.textContent =
-    Array.from(
-      { length: count },
-      (_, index) =>
-        index + 1
-    ).join("\n");
-
-}
-
-
-function updateCursor() {
-
-  const before =
-    editor.value.slice(
-      0,
-      editor.selectionStart
-    );
-
-
-  const lines =
-    before.split("\n");
-
-
-  cursorStatus.textContent =
-    `Ln ${lines.length}, Col ${
-      lines[lines.length - 1].length + 1
-    }`;
-
-}
-
 
 function updateStatus() {
 
@@ -989,6 +1362,9 @@ function updateStatus() {
 
     languageStatus.textContent =
       "Plain Text";
+
+    cursorStatus.textContent =
+      "Ln 1, Col 1";
 
     return;
 
@@ -1008,6 +1384,10 @@ function updateStatus() {
 
 }
 
+
+/* =========================
+   ACCENT
+========================= */
 
 function updateAccent() {
 
@@ -1030,6 +1410,10 @@ function updateAccent() {
 }
 
 
+/* =========================
+   VISIBILITY
+========================= */
+
 function updateVisibility() {
 
   const hasFile =
@@ -1047,8 +1431,29 @@ function updateVisibility() {
     !hasFile
   );
 
+
+  if (
+    hasFile &&
+    editor
+  ) {
+
+    setTimeout(
+      () => {
+
+        editor.layout();
+
+      },
+      0
+    );
+
+  }
+
 }
 
+
+/* =========================
+   UPDATE EVERYTHING
+========================= */
 
 function updateEverything() {
 
@@ -1056,11 +1461,7 @@ function updateEverything() {
 
   renderTabs();
 
-  updateLineNumbers();
-
   updateStatus();
-
-  updateCursor();
 
   updateAccent();
 
@@ -1099,7 +1500,8 @@ function openNewFilePicker() {
       ".file-type-picker"
     )
     .forEach(
-      element => element.remove()
+      element =>
+        element.remove()
     );
 
 
@@ -1112,54 +1514,51 @@ function openNewFilePicker() {
 
 
   Object.entries(FILE_TYPES)
-    .forEach(([key, type]) => {
+    .forEach(
+      ([key, type]) => {
 
-      const button =
-        document.createElement("button");
-
-
-      button.className =
-        "file-type-choice";
+        const button =
+          document.createElement("button");
 
 
-      button.style.setProperty(
-        "--choice-color",
-        type.color
-      );
+        button.className =
+          "file-type-choice";
 
 
-      button.innerHTML = `
-
-        <span
-          class="choice-icon"
-        >
-          ${escapeHtml(type.icon)}
-        </span>
-
-        <span
-          class="choice-name"
-        >
-          ${escapeHtml(type.label)}
-        </span>
-
-        <span
-          class="choice-extension"
-        >
-          .${type.extension}
-        </span>
-
-      `;
+        button.style.setProperty(
+          "--choice-color",
+          type.color
+        );
 
 
-      button.addEventListener(
-        "click",
-        () => chooseFileType(key)
-      );
+        button.innerHTML = `
+          <span class="choice-icon">
+            ${escapeHtml(type.icon)}
+          </span>
+
+          <span class="choice-name">
+            ${escapeHtml(type.label)}
+          </span>
+
+          <span class="choice-extension">
+            .${type.extension}
+          </span>
+        `;
 
 
-      picker.appendChild(button);
+        button.addEventListener(
+          "click",
+          () =>
+            chooseFileType(key)
+        );
 
-    });
+
+        picker.appendChild(
+          button
+        );
+
+      }
+    );
 
 
   modalText.after(
@@ -1173,6 +1572,10 @@ function openNewFilePicker() {
 
 }
 
+
+/* =========================
+   CHOOSE FILE TYPE
+========================= */
 
 function chooseFileType(key) {
 
@@ -1225,27 +1628,9 @@ function chooseFileType(key) {
 }
 
 
-modalConfirm.addEventListener(
-  "click",
-  createSelectedFile
-);
-
-
-modalInput.addEventListener(
-  "keydown",
-  event => {
-
-    if (
-      event.key === "Enter"
-    ) {
-
-      createSelectedFile();
-
-    }
-
-  }
-);
-
+/* =========================
+   CREATE FILE
+========================= */
 
 function createSelectedFile() {
 
@@ -1296,14 +1681,22 @@ function createSelectedFile() {
 
 
   const file = {
-    id: createId(),
+
+    id:
+      createId(),
+
     name,
+
     content:
       selectedType.content
+
   };
 
 
-  project.files.push(file);
+  project.files.push(
+    file
+  );
+
 
   project.activeFileId =
     file.id;
@@ -1314,11 +1707,9 @@ function createSelectedFile() {
   );
 
 
-  editor.value =
-    file.content;
-
-
   closeModal();
+
+  loadFileIntoEditor();
 
   updateEverything();
 
@@ -1326,6 +1717,10 @@ function createSelectedFile() {
 
 }
 
+
+/* =========================
+   CLOSE MODAL
+========================= */
 
 function closeModal() {
 
@@ -1354,6 +1749,28 @@ function closeModal() {
 }
 
 
+modalConfirm.addEventListener(
+  "click",
+  createSelectedFile
+);
+
+
+modalInput.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      createSelectedFile();
+
+    }
+
+  }
+);
+
+
 modalCancel.addEventListener(
   "click",
   closeModal
@@ -1365,7 +1782,8 @@ modalOverlay.addEventListener(
   event => {
 
     if (
-      event.target === modalOverlay
+      event.target ===
+      modalOverlay
     ) {
 
       closeModal();
@@ -1420,20 +1838,33 @@ document
    IMPORT
 ========================= */
 
+function openImport() {
+
+  fileInput.value = "";
+
+  fileInput.click();
+
+}
+
+
 document
   .getElementById(
     "importButton"
   )
   .addEventListener(
     "click",
-    () => {
+    openImport
+  );
 
-      fileInput.value = "";
 
-      fileInput.click();
-
-    }
-);
+document
+  .getElementById(
+    "importSidebarButton"
+  )
+  .addEventListener(
+    "click",
+    openImport
+  );
 
 
 fileInput.addEventListener(
@@ -1444,29 +1875,81 @@ fileInput.addEventListener(
       [...fileInput.files];
 
 
-    for (const imported of files) {
+    for (
+      const imported
+      of files
+    ) {
 
       const content =
         await imported.text();
 
 
+      const alreadyExists =
+        project.files.some(
+          file =>
+            file.name
+              .toLowerCase() ===
+            imported.name
+              .toLowerCase()
+        );
+
+
+      if (
+        alreadyExists
+      ) {
+
+        continue;
+
+      }
+
+
       project.files.push({
-        id: createId(),
-        name: imported.name,
+
+        id:
+          createId(),
+
+        name:
+          imported.name,
+
         content
+
       });
 
     }
 
 
-    if (files.length) {
+    if (
+      files.length
+    ) {
 
-      openFile(
-        project.files.at(-1).id
-      );
+      const lastFile =
+        project.files.at(-1);
+
+
+      if (lastFile) {
+
+        project.activeFileId =
+          lastFile.id;
+
+
+        if (
+          !project.openTabs.includes(
+            lastFile.id
+          )
+        ) {
+
+          project.openTabs.push(
+            lastFile.id
+          );
+
+        }
+
+      }
 
     }
 
+
+    loadFileIntoEditor();
 
     updateEverything();
 
@@ -1477,7 +1960,7 @@ fileInput.addEventListener(
 
 
 /* =========================
-   EXPORT FILE
+   EXPORT CURRENT FILE
 ========================= */
 
 function exportCurrentFile() {
@@ -1499,35 +1982,50 @@ function exportCurrentFile() {
 
   const blob =
     new Blob(
-      [file.content],
+
+      [
+        file.content
+      ],
+
       {
-        type: "text/plain"
+        type:
+          "text/plain"
       }
+
     );
 
 
   const url =
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
 
   const link =
     document.createElement("a");
 
 
-  link.href = url;
+  link.href =
+    url;
+
 
   link.download =
     file.name;
 
 
-  document.body.appendChild(link);
+  document.body.appendChild(
+    link
+  );
+
 
   link.click();
 
   link.remove();
 
 
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(
+    url
+  );
 
 }
 
@@ -1539,20 +2037,29 @@ function exportCurrentFile() {
 function exportProject() {
 
   const exportData = {
-    name: project.name,
+
+    name:
+      project.name,
 
     files:
       project.files.map(
         file => ({
-          name: file.name,
-          content: file.content
+
+          name:
+            file.name,
+
+          content:
+            file.content
+
         })
       )
+
   };
 
 
   const blob =
     new Blob(
+
       [
         JSON.stringify(
           exportData,
@@ -1560,35 +2067,46 @@ function exportProject() {
           2
         )
       ],
+
       {
         type:
           "application/json"
       }
+
     );
 
 
   const url =
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
 
   const link =
     document.createElement("a");
 
 
-  link.href = url;
+  link.href =
+    url;
+
 
   link.download =
     `${project.name}.json`;
 
 
-  document.body.appendChild(link);
+  document.body.appendChild(
+    link
+  );
+
 
   link.click();
 
   link.remove();
 
 
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(
+    url
+  );
 
 }
 
@@ -1602,16 +2120,25 @@ function exportProject() {
   "addFileButton",
   "emptyNewFileButton"
 ]
-.forEach(id => {
+.forEach(
+  id => {
 
-  document
-    .getElementById(id)
-    .addEventListener(
+    const button =
+      document.getElementById(
+        id
+      );
+
+
+    if (!button) return;
+
+
+    button.addEventListener(
       "click",
       openNewFilePicker
     );
 
-});
+  }
+);
 
 
 document
@@ -1635,6 +2162,31 @@ document
 
 
 /* =========================
+   KEYBOARD SAVE
+========================= */
+
+window.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      (event.ctrlKey ||
+        event.metaKey) &&
+      event.key.toLowerCase() ===
+        "s"
+    ) {
+
+      event.preventDefault();
+
+      exportCurrentFile();
+
+    }
+
+  }
+);
+
+
+/* =========================
    START
 ========================= */
 
@@ -1645,18 +2197,10 @@ projectNameElement.textContent =
   project.name;
 
 
-const active =
-  getActiveFile();
-
-
-if (active) {
-
-  editor.value =
-    active.content;
-
-}
-
-
 updateEverything();
+
+
+initializeMonaco();
+
 
 saveProject();
