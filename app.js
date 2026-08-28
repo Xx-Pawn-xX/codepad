@@ -1,18 +1,10 @@
-const STORAGE_KEY = "codepad-own-editor-v1";
-
-
-/* DOM */
+const STORAGE_KEY = "codepad-v4";
 
 const fileList = document.getElementById("fileList");
 const tabs = document.getElementById("tabs");
-
 const editor = document.getElementById("editor");
-const highlighting = document.getElementById("highlighting");
-const highlightedCode = document.getElementById("highlightedCode");
-
+const lineNumbers = document.getElementById("lineNumbers");
 const editorWrapper = document.getElementById("editorWrapper");
-const suggestionsBox = document.getElementById("suggestions");
-
 const emptyState = document.getElementById("emptyState");
 
 const projectNameElement =
@@ -49,7 +41,9 @@ const modalCancel =
   document.getElementById("modalCancel");
 
 
-/* FILE TYPES */
+/* =========================
+   FILE TYPES
+========================= */
 
 const FILE_TYPES = {
 
@@ -63,8 +57,12 @@ const FILE_TYPES = {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
   <title>My Project</title>
 </head>
+
 <body>
 
   <h1>Hello World</h1>
@@ -103,7 +101,7 @@ body {
     color: "#60a5fa",
     icon: "TS",
     defaultName: "app",
-    content: `console.log("Hello World!");`
+    content: `console.log("Hello from TypeScript!");`
   },
 
   md: {
@@ -114,7 +112,12 @@ body {
     defaultName: "README",
     content: `# My Project
 
-Made with CodePad.`
+Made with CodePad.
+
+## About
+
+Write something about your project here.
+`
   },
 
   py: {
@@ -163,6 +166,84 @@ Made with CodePad.`
 }`
   },
 
+  cpp: {
+    label: "C++",
+    extension: "cpp",
+    color: "#06b6d4",
+    icon: "C+",
+    defaultName: "main",
+    content: `#include <iostream>
+
+int main() {
+
+  std::cout << "Hello World!";
+
+  return 0;
+
+}`
+  },
+
+  c: {
+    label: "C",
+    extension: "c",
+    color: "#14b8a6",
+    icon: "C",
+    defaultName: "main",
+    content: `#include <stdio.h>
+
+int main() {
+
+  printf("Hello World!");
+
+  return 0;
+
+}`
+  },
+
+  cs: {
+    label: "C#",
+    extension: "cs",
+    color: "#8b5cf6",
+    icon: "C#",
+    defaultName: "Program",
+    content: `Console.WriteLine("Hello World!");`
+  },
+
+  php: {
+    label: "PHP",
+    extension: "php",
+    color: "#818cf8",
+    icon: "PHP",
+    defaultName: "index",
+    content: `<?php
+
+echo "Hello World!";
+
+?>`
+  },
+
+  sql: {
+    label: "SQL",
+    extension: "sql",
+    color: "#38bdf8",
+    icon: "SQL",
+    defaultName: "database",
+    content: `SELECT * FROM table_name;`
+  },
+
+  xml: {
+    label: "XML",
+    extension: "xml",
+    color: "#f43f5e",
+    icon: "</>",
+    defaultName: "data",
+    content: `<?xml version="1.0"?>
+
+<root>
+
+</root>`
+  },
+
   txt: {
     label: "Text",
     extension: "txt",
@@ -171,6 +252,7 @@ Made with CodePad.`
     defaultName: "notes",
     content: ``
   }
+
 };
 
 
@@ -181,53 +263,9 @@ const FALLBACK_TYPE = {
 };
 
 
-/* AUTOCOMPLETE WORDS */
-
-const SUGGESTIONS = {
-
-  html: [
-    "<html>", "<head>", "<body>", "<div>",
-    "<span>", "<h1>", "<h2>", "<p>",
-    "<button>", "<input>", "<img>",
-    "<a>", "<script>", "<style>",
-    "<section>", "<main>", "<header>",
-    "<footer>", "<meta>", "<link>"
-  ],
-
-  css: [
-    "display", "position", "background",
-    "background-color", "color", "margin",
-    "padding", "width", "height",
-    "border", "border-radius", "font-size",
-    "font-weight", "flex", "grid",
-    "justify-content", "align-items",
-    "transition", "transform", "opacity"
-  ],
-
-  js: [
-    "console", "console.log",
-    "const", "let", "var",
-    "function", "return", "if",
-    "else", "for", "while",
-    "class", "new", "async",
-    "await", "fetch", "document",
-    "window", "addEventListener",
-    "querySelector", "getElementById",
-    "localStorage", "JSON",
-    "Math", "Array", "Object"
-  ],
-
-  python: [
-    "print", "def", "return",
-    "if", "else", "elif",
-    "for", "while", "import",
-    "from", "class", "True",
-    "False", "None", "range",
-    "len", "list", "dict"
-  ]
-
-};
-
+/* =========================
+   PROJECT
+========================= */
 
 let project = {
   name: "Untitled Project",
@@ -236,735 +274,302 @@ let project = {
   openTabs: []
 };
 
+
 let selectedType = null;
-let selectedSuggestion = 0;
 
 
-/* HELPERS */
+/* =========================
+   HELPERS
+========================= */
 
 function createId() {
-  return Date.now().toString(36) +
-    Math.random().toString(36).slice(2);
+
+  return (
+    Date.now().toString(36) +
+    Math.random()
+      .toString(36)
+      .slice(2)
+  );
+
 }
+
 
 function getExtension(filename) {
-  const parts = filename.split(".");
-  return parts.length > 1
-    ? parts.pop().toLowerCase()
-    : "";
+
+  const parts =
+    filename.split(".");
+
+  if (parts.length < 2) {
+    return "";
+  }
+
+  return parts
+    .pop()
+    .toLowerCase();
+
 }
+
 
 function getFileType(filename) {
-  return FILE_TYPES[getExtension(filename)] ||
-    FALLBACK_TYPE;
+
+  const extension =
+    getExtension(filename);
+
+  return (
+    FILE_TYPES[extension] ||
+    FALLBACK_TYPE
+  );
+
 }
+
 
 function getActiveFile() {
+
   return project.files.find(
-    file => file.id === project.activeFileId
+    file =>
+      file.id ===
+      project.activeFileId
   );
+
 }
+
 
 function escapeHtml(text) {
+
   return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
 }
 
 
-/* PROJECT */
+/* =========================
+   STARTER PROJECT
+========================= */
 
 function createStarterProject() {
 
-  const types = [
+  const starterTypes = [
     "html",
     "css",
     "js",
     "md",
     "py",
     "json",
-    "yaml"
+    "yaml",
+    "ts",
+    "java",
+    "cpp",
+    "c",
+    "cs",
+    "php",
+    "sql",
+    "xml",
+    "txt"
   ];
 
-  project.files = types.map(key => {
 
-    const type = FILE_TYPES[key];
+  project.files =
+    starterTypes.map(key => {
 
-    return {
-      id: createId(),
-      name:
-        type.defaultName +
-        "." +
-        type.extension,
-      content: type.content
-    };
+      const type =
+        FILE_TYPES[key];
 
-  });
+      return {
+        id: createId(),
+
+        name:
+          type.defaultName +
+          "." +
+          type.extension,
+
+        content:
+          type.content
+      };
+
+    });
+
 
   project.activeFileId =
     project.files[0].id;
 
+
   project.openTabs = [
     project.files[0].id
   ];
+
 }
 
 
+/* =========================
+   SAVE / LOAD
+========================= */
+
 function saveProject() {
+
   localStorage.setItem(
     STORAGE_KEY,
     JSON.stringify(project)
   );
+
 }
 
 
 function loadProject() {
 
   const saved =
-    localStorage.getItem(STORAGE_KEY);
+    localStorage.getItem(
+      STORAGE_KEY
+    );
+
 
   if (!saved) {
+
     createStarterProject();
+
     saveProject();
+
     return;
+
   }
+
 
   try {
 
-    project = JSON.parse(saved);
+    project =
+      JSON.parse(saved);
 
-    if (!project.files?.length) {
+
+    if (
+      !project.files ||
+      project.files.length === 0
+    ) {
+
       createStarterProject();
+
+      saveProject();
+
     }
 
-  } catch {
+  }
+
+  catch {
 
     createStarterProject();
 
+    saveProject();
+
   }
+
 }
 
 
-/* SYNTAX HIGHLIGHTING */
-
-function highlightCode(code, filename) {
-
-  const extension = getExtension(filename);
-
-  let html = escapeHtml(code);
-
-  if (extension === "html") {
-
-    html = html
-      .replace(
-        /(&lt;!--[\s\S]*?--&gt;)/g,
-        `<span class="token-comment">$1</span>`
-      )
-      .replace(
-        /(&lt;\/?[a-zA-Z0-9-]+)/g,
-        `<span class="token-tag">$1</span>`
-      )
-      .replace(
-        /([a-zA-Z-]+)(=)/g,
-        `<span class="token-attribute">$1</span>$2`
-      )
-      .replace(
-        /("[^"]*"|'[^']*')/g,
-        `<span class="token-string">$1</span>`
-      );
-
-  }
-
-  else if (
-    extension === "js" ||
-    extension === "ts"
-  ) {
-
-    html = html
-      .replace(
-        /(\/\/.*)/g,
-        `<span class="token-comment">$1</span>`
-      )
-      .replace(
-        /(["'`])(?:\\.|(?!\1)[^\\])*\1/g,
-        `<span class="token-string">$&</span>`
-      )
-      .replace(
-        /\b(const|let|var|function|return|if|else|for|while|class|new|async|await|import|from|export|true|false|null|undefined)\b/g,
-        `<span class="token-keyword">$1</span>`
-      )
-      .replace(
-        /\b(\d+)\b/g,
-        `<span class="token-number">$1</span>`
-      );
-
-  }
-
-  else if (extension === "css") {
-
-    html = html
-      .replace(
-        /(\/\*[\s\S]*?\*\/)/g,
-        `<span class="token-comment">$1</span>`
-      )
-      .replace(
-        /([a-zA-Z-]+)(:)/g,
-        `<span class="token-property">$1</span>$2`
-      )
-      .replace(
-        /("[^"]*"|'[^']*')/g,
-        `<span class="token-string">$1</span>`
-      )
-      .replace(
-        /(\.[a-zA-Z0-9_-]+|#[a-zA-Z0-9_-]+)/g,
-        `<span class="token-selector">$1</span>`
-      );
-
-  }
-
-  else if (extension === "py") {
-
-    html = html
-      .replace(
-        /(#.*)/g,
-        `<span class="token-comment">$1</span>`
-      )
-      .replace(
-        /(["'])(?:\\.|(?!\1)[^\\])*\1/g,
-        `<span class="token-string">$&</span>`
-      )
-      .replace(
-        /\b(def|return|if|else|elif|for|while|import|from|class|True|False|None|in)\b/g,
-        `<span class="token-keyword">$1</span>`
-      );
-
-  }
-
-  else if (extension === "json") {
-
-    html = html
-      .replace(
-        /"([^"]+)"(?=\s*:)/g,
-        `<span class="token-property">"$1"</span>`
-      )
-      .replace(
-        /"([^"]*)"/g,
-        `<span class="token-string">"$1"</span>`
-      )
-      .replace(
-        /\b(true|false|null)\b/g,
-        `<span class="token-keyword">$1</span>`
-      )
-      .replace(
-        /\b\d+\b/g,
-        `<span class="token-number">$&</span>`
-      );
-  }
-
-  return html + "\n";
-}
-
-
-function updateHighlighting() {
-
-  const file = getActiveFile();
-
-  if (!file) {
-    highlightedCode.innerHTML = "";
-    return;
-  }
-
-  highlightedCode.innerHTML =
-    highlightCode(
-      editor.value,
-      file.name
-    );
-}
-
-
-/* EDITOR */
-
-function loadActiveFile() {
-
-  const file = getActiveFile();
-
-  if (!file) {
-    editor.value = "";
-    return;
-  }
-
-  editor.value = file.content;
-
-  updateHighlighting();
-
-  editor.scrollTop = 0;
-  editor.scrollLeft = 0;
-
-  updateStatus();
-}
-
-
-editor.addEventListener("input", () => {
-
-  const file = getActiveFile();
-
-  if (!file) return;
-
-  file.content = editor.value;
-
-  updateHighlighting();
-  updateCursor();
-
-  saveProject();
-
-  showSuggestions();
-});
-
-
-editor.addEventListener("scroll", () => {
-
-  highlighting.scrollTop =
-    editor.scrollTop;
-
-  highlighting.scrollLeft =
-    editor.scrollLeft;
-});
-
-
-editor.addEventListener("click", () => {
-  updateCursor();
-  showSuggestions();
-});
-
-
-editor.addEventListener("keyup", event => {
-
-  if (
-    ["ArrowUp", "ArrowDown", "Enter", "Escape"]
-      .includes(event.key)
-  ) return;
-
-  updateCursor();
-  showSuggestions();
-});
-
-
-/* AUTO BRACKETS */
-
-editor.addEventListener("keydown", event => {
-
-  if (
-    !suggestionsBox.classList.contains("hidden")
-  ) {
-
-    const buttons =
-      [...suggestionsBox.children];
-
-    if (event.key === "ArrowDown") {
-
-      event.preventDefault();
-
-      selectedSuggestion =
-        Math.min(
-          selectedSuggestion + 1,
-          buttons.length - 1
-        );
-
-      updateSuggestionSelection();
-
-      return;
-    }
-
-    if (event.key === "ArrowUp") {
-
-      event.preventDefault();
-
-      selectedSuggestion =
-        Math.max(
-          selectedSuggestion - 1,
-          0
-        );
-
-      updateSuggestionSelection();
-
-      return;
-    }
-
-    if (
-      event.key === "Enter" ||
-      event.key === "Tab"
-    ) {
-
-      event.preventDefault();
-
-      const button =
-        buttons[selectedSuggestion];
-
-      if (button) {
-        insertSuggestion(
-          button.dataset.value
-        );
-      }
-
-      return;
-    }
-
-    if (event.key === "Escape") {
-      hideSuggestions();
-      return;
-    }
-  }
-
-
-  const pairs = {
-    "(": ")",
-    "[": "]",
-    "{": "}",
-    '"': '"',
-    "'": "'",
-    "`": "`"
-  };
-
-
-  if (pairs[event.key]) {
-
-    event.preventDefault();
-
-    const start =
-      editor.selectionStart;
-
-    const end =
-      editor.selectionEnd;
-
-    const selected =
-      editor.value.slice(start, end);
-
-    const opening =
-      event.key;
-
-    const closing =
-      pairs[event.key];
-
-    editor.setRangeText(
-      opening +
-      selected +
-      closing,
-      start,
-      end,
-      "end"
-    );
-
-    if (!selected) {
-
-      editor.selectionStart =
-        start + 1;
-
-      editor.selectionEnd =
-        start + 1;
-    }
-
-    editor.dispatchEvent(
-      new Event("input")
-    );
-
-    return;
-  }
-
-
-  if (event.key === "Tab") {
-
-    event.preventDefault();
-
-    const start =
-      editor.selectionStart;
-
-    editor.setRangeText(
-      "  ",
-      start,
-      editor.selectionEnd,
-      "end"
-    );
-
-    editor.dispatchEvent(
-      new Event("input")
-    );
-  }
-
-});
-
-
-/* CURSOR */
-
-function updateCursor() {
-
-  const before =
-    editor.value.slice(
-      0,
-      editor.selectionStart
-    );
-
-  const lines =
-    before.split("\n");
-
-  cursorStatus.textContent =
-    `Ln ${lines.length}, Col ${lines.at(-1).length + 1}`;
-}
-
-
-/* AUTOCOMPLETE */
-
-function getSuggestionLanguage() {
-
-  const ext =
-    getExtension(
-      getActiveFile()?.name || ""
-    );
-
-  if (ext === "html") return "html";
-  if (ext === "css") return "css";
-  if (ext === "js" || ext === "ts") return "js";
-  if (ext === "py") return "python";
-
-  return null;
-}
-
-
-function getCurrentWord() {
-
-  const before =
-    editor.value.slice(
-      0,
-      editor.selectionStart
-    );
-
-  const match =
-    before.match(/[a-zA-Z0-9_.<>/-]+$/);
-
-  return match ? match[0] : "";
-}
-
-
-function showSuggestions() {
-
-  const language =
-    getSuggestionLanguage();
-
-  if (!language) {
-    hideSuggestions();
-    return;
-  }
-
-  const word =
-    getCurrentWord();
-
-  if (word.length < 2) {
-    hideSuggestions();
-    return;
-  }
-
-  const options =
-    SUGGESTIONS[language]
-      .filter(item =>
-        item
-          .toLowerCase()
-          .startsWith(
-            word.toLowerCase()
-          ) &&
-        item.toLowerCase() !==
-          word.toLowerCase()
-      )
-      .slice(0, 8);
-
-  if (!options.length) {
-    hideSuggestions();
-    return;
-  }
-
-  selectedSuggestion = 0;
-
-  suggestionsBox.innerHTML = "";
-
-  options.forEach((item, index) => {
-
-    const button =
-      document.createElement("button");
-
-    button.className = "suggestion";
-
-    if (index === 0) {
-      button.classList.add("active");
-    }
-
-    button.dataset.value = item;
-
-    button.innerHTML = `
-      <span>${item}</span>
-      <span class="suggestion-type">
-        ${language}
-      </span>
-    `;
-
-    button.addEventListener(
-      "mousedown",
-      event => {
-
-        event.preventDefault();
-
-        insertSuggestion(item);
-
-      }
-    );
-
-    suggestionsBox.appendChild(button);
-
-  });
-
-
-  const lineHeight = 22;
-
-  const before =
-    editor.value.slice(
-      0,
-      editor.selectionStart
-    );
-
-  const lines =
-    before.split("\n");
-
-  const line =
-    lines.length - 1;
-
-  suggestionsBox.style.top =
-    Math.min(
-      editorWrapper.clientHeight - 230,
-      16 + (line + 1) * lineHeight -
-      editor.scrollTop
-    ) + "px";
-
-  suggestionsBox.style.left =
-    "18px";
-
-  suggestionsBox.classList.remove("hidden");
-}
-
-
-function updateSuggestionSelection() {
-
-  [...suggestionsBox.children]
-    .forEach((button, index) => {
-
-      button.classList.toggle(
-        "active",
-        index === selectedSuggestion
-      );
-
-    });
-}
-
-
-function hideSuggestions() {
-
-  suggestionsBox.classList.add("hidden");
-
-  suggestionsBox.innerHTML = "";
-}
-
-
-function insertSuggestion(value) {
-
-  const word =
-    getCurrentWord();
-
-  const end =
-    editor.selectionStart;
-
-  const start =
-    end - word.length;
-
-  editor.setRangeText(
-    value,
-    start,
-    end,
-    "end"
-  );
-
-  editor.focus();
-
-  editor.dispatchEvent(
-    new Event("input")
-  );
-
-  hideSuggestions();
-}
-
-
-/* FILE LIST */
+/* =========================
+   FILE LIST
+========================= */
 
 function renderFileList() {
 
   fileList.innerHTML = "";
+
 
   project.files.forEach(file => {
 
     const type =
       getFileType(file.name);
 
+
     const item =
       document.createElement("div");
 
-    item.className = "file-item";
+
+    item.className =
+      "file-item";
+
 
     if (
       file.id ===
       project.activeFileId
     ) {
+
       item.classList.add("active");
+
     }
+
 
     item.style.setProperty(
       "--file-color",
       type.color
     );
 
-    const open =
+
+    const openButton =
       document.createElement("button");
 
-    open.className = "file-open";
 
-    open.innerHTML = `
-      <span class="file-icon">
+    openButton.className =
+      "file-open";
+
+
+    openButton.innerHTML = `
+
+      <span
+        class="file-icon"
+      >
         ${escapeHtml(type.icon)}
       </span>
 
-      <span class="file-name">
+      <span
+        class="file-name"
+      >
         ${escapeHtml(file.name)}
       </span>
 
-      <span class="file-tag">
+      <span
+        class="file-tag"
+      >
         ${escapeHtml(type.label)}
       </span>
+
     `;
 
-    open.onclick = () =>
-      openFile(file.id);
 
-    const del =
+    openButton.addEventListener(
+      "click",
+      () => openFile(file.id)
+    );
+
+
+    const deleteButton =
       document.createElement("button");
 
-    del.className = "delete-file";
 
-    del.textContent = "×";
+    deleteButton.className =
+      "delete-file";
 
-    del.onclick = event => {
 
-      event.stopPropagation();
+    deleteButton.textContent =
+      "×";
 
-      deleteFile(file.id);
 
-    };
+    deleteButton.addEventListener(
+      "click",
+      event => {
 
-    item.append(open, del);
+        event.stopPropagation();
+
+        deleteFile(file.id);
+
+      }
+    );
+
+
+    item.appendChild(openButton);
+
+    item.appendChild(deleteButton);
 
     fileList.appendChild(item);
 
@@ -973,59 +578,99 @@ function renderFileList() {
 }
 
 
-/* TABS */
+/* =========================
+   TABS
+========================= */
 
 function renderTabs() {
 
   tabs.innerHTML = "";
 
+
   project.openTabs.forEach(id => {
 
     const file =
       project.files.find(
-        f => f.id === id
+        item => item.id === id
       );
 
+
     if (!file) return;
+
 
     const type =
       getFileType(file.name);
 
+
     const tab =
       document.createElement("div");
 
-    tab.className = "tab";
 
-    if (
-      id === project.activeFileId
-    ) {
-      tab.classList.add("active");
-    }
+    tab.className =
+      "tab";
+
 
     tab.style.setProperty(
       "--file-color",
       type.color
     );
 
+
+    if (
+      file.id ===
+      project.activeFileId
+    ) {
+
+      tab.classList.add("active");
+
+    }
+
+
     const name =
       document.createElement("button");
 
-    name.className = "tab-name";
-    name.textContent = file.name;
 
-    name.onclick = () =>
-      openFile(id);
+    name.className =
+      "tab-name";
+
+
+    name.textContent =
+      file.name;
+
+
+    name.addEventListener(
+      "click",
+      () => openFile(file.id)
+    );
+
 
     const close =
       document.createElement("button");
 
-    close.className = "tab-close";
-    close.textContent = "×";
 
-    close.onclick = () =>
-      closeTab(id);
+    close.className =
+      "tab-close";
 
-    tab.append(name, close);
+
+    close.textContent =
+      "×";
+
+
+    close.addEventListener(
+      "click",
+      event => {
+
+        event.stopPropagation();
+
+        closeTab(id);
+
+      }
+    );
+
+
+    tab.appendChild(name);
+
+    tab.appendChild(close);
 
     tabs.appendChild(tab);
 
@@ -1034,32 +679,56 @@ function renderTabs() {
 }
 
 
-/* FILE ACTIONS */
+/* =========================
+   OPEN FILE
+========================= */
 
 function openFile(id) {
 
-  project.activeFileId = id;
+  const file =
+    project.files.find(
+      item => item.id === id
+    );
+
+
+  if (!file) return;
+
+
+  project.activeFileId =
+    id;
+
 
   if (
     !project.openTabs.includes(id)
   ) {
+
     project.openTabs.push(id);
+
   }
 
-  loadActiveFile();
+
+  editor.value =
+    file.content;
+
+
   updateEverything();
+
   saveProject();
 
-  editor.focus();
 }
 
+
+/* =========================
+   CLOSE TAB
+========================= */
 
 function closeTab(id) {
 
   project.openTabs =
     project.openTabs.filter(
-      tab => tab !== id
+      tabId => tabId !== id
     );
+
 
   if (
     project.activeFileId === id
@@ -1072,55 +741,246 @@ function closeTab(id) {
 
   }
 
-  loadActiveFile();
+
+  const active =
+    getActiveFile();
+
+
+  editor.value =
+    active
+      ? active.content
+      : "";
+
+
   updateEverything();
+
   saveProject();
+
 }
 
+
+/* =========================
+   DELETE FILE
+========================= */
 
 function deleteFile(id) {
 
   const file =
     project.files.find(
-      f => f.id === id
+      item => item.id === id
     );
 
+
   if (!file) return;
+
 
   if (
     !confirm(
       `Delete ${file.name}?`
     )
-  ) return;
+  ) {
+    return;
+  }
+
 
   project.files =
     project.files.filter(
-      f => f.id !== id
+      item => item.id !== id
     );
+
 
   project.openTabs =
     project.openTabs.filter(
-      tab => tab !== id
+      item => item !== id
     );
+
 
   if (
     project.activeFileId === id
   ) {
+
     project.activeFileId =
-      project.files[0]?.id || null;
+      project.files[0]?.id ||
+      null;
+
   }
 
-  loadActiveFile();
+
+  const active =
+    getActiveFile();
+
+
+  editor.value =
+    active
+      ? active.content
+      : "";
+
+
   updateEverything();
+
   saveProject();
+
 }
 
 
-/* STATUS */
+/* =========================
+   EDITOR
+========================= */
+
+editor.addEventListener(
+  "input",
+  () => {
+
+    const file =
+      getActiveFile();
+
+
+    if (!file) return;
+
+
+    file.content =
+      editor.value;
+
+
+    updateLineNumbers();
+
+    updateCursor();
+
+    saveProject();
+
+  }
+);
+
+
+editor.addEventListener(
+  "scroll",
+  () => {
+
+    lineNumbers.scrollTop =
+      editor.scrollTop;
+
+  }
+);
+
+
+editor.addEventListener(
+  "click",
+  updateCursor
+);
+
+
+editor.addEventListener(
+  "keyup",
+  updateCursor
+);
+
+
+editor.addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key === "Tab") {
+
+      event.preventDefault();
+
+
+      const start =
+        editor.selectionStart;
+
+      const end =
+        editor.selectionEnd;
+
+
+      editor.value =
+        editor.value.substring(
+          0,
+          start
+        ) +
+
+        "  " +
+
+        editor.value.substring(
+          end
+        );
+
+
+      editor.selectionStart =
+        start + 2;
+
+      editor.selectionEnd =
+        start + 2;
+
+
+      editor.dispatchEvent(
+        new Event("input")
+      );
+
+    }
+
+
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      event.key.toLowerCase() === "s"
+    ) {
+
+      event.preventDefault();
+
+      exportCurrentFile();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   STATUS
+========================= */
+
+function updateLineNumbers() {
+
+  const count =
+    editor.value
+      .split("\n")
+      .length;
+
+
+  lineNumbers.textContent =
+    Array.from(
+      { length: count },
+      (_, index) =>
+        index + 1
+    ).join("\n");
+
+}
+
+
+function updateCursor() {
+
+  const before =
+    editor.value.slice(
+      0,
+      editor.selectionStart
+    );
+
+
+  const lines =
+    before.split("\n");
+
+
+  cursorStatus.textContent =
+    `Ln ${lines.length}, Col ${
+      lines[lines.length - 1].length + 1
+    }`;
+
+}
+
 
 function updateStatus() {
 
-  const file = getActiveFile();
+  const file =
+    getActiveFile();
+
 
   if (!file) {
 
@@ -1131,22 +991,42 @@ function updateStatus() {
       "Plain Text";
 
     return;
+
   }
+
 
   const type =
     getFileType(file.name);
 
+
   fileStatus.textContent =
     file.name;
+
 
   languageStatus.textContent =
     type.label;
 
+}
+
+
+function updateAccent() {
+
+  const file =
+    getActiveFile();
+
+
+  const color =
+    file
+      ? getFileType(file.name).color
+      : "#ffffff";
+
+
   document.documentElement
     .style.setProperty(
       "--accent",
-      type.color
+      color
     );
+
 }
 
 
@@ -1155,55 +1035,81 @@ function updateVisibility() {
   const hasFile =
     !!getActiveFile();
 
-  editorWrapper.classList.toggle(
-    "hidden",
-    !hasFile
-  );
 
   emptyState.classList.toggle(
     "hidden",
     hasFile
   );
+
+
+  editorWrapper.classList.toggle(
+    "hidden",
+    !hasFile
+  );
+
 }
 
 
 function updateEverything() {
 
   renderFileList();
+
   renderTabs();
+
+  updateLineNumbers();
+
   updateStatus();
+
+  updateCursor();
+
+  updateAccent();
+
   updateVisibility();
 
 }
 
 
-/* NEW FILE */
+/* =========================
+   FILE TYPE PICKER
+========================= */
 
 function openNewFilePicker() {
 
   selectedType = null;
 
+
   modalTitle.textContent =
     "Create New File";
+
 
   modalText.textContent =
     "Choose a file type.";
 
+
   modalInput.style.display =
     "none";
+
 
   modalConfirm.style.display =
     "none";
 
+
   document
-    .querySelector(".file-type-picker")
-    ?.remove();
+    .querySelectorAll(
+      ".file-type-picker"
+    )
+    .forEach(
+      element => element.remove()
+    );
+
 
   const picker =
     document.createElement("div");
 
+
   picker.className =
     "file-type-picker";
+
 
   Object.entries(FILE_TYPES)
     .forEach(([key, type]) => {
@@ -1211,258 +1117,445 @@ function openNewFilePicker() {
       const button =
         document.createElement("button");
 
+
       button.className =
         "file-type-choice";
+
 
       button.style.setProperty(
         "--choice-color",
         type.color
       );
 
+
       button.innerHTML = `
-        <span class="choice-icon">
-          ${type.icon}
+
+        <span
+          class="choice-icon"
+        >
+          ${escapeHtml(type.icon)}
         </span>
 
-        <span class="choice-name">
-          ${type.label}
+        <span
+          class="choice-name"
+        >
+          ${escapeHtml(type.label)}
         </span>
 
-        <span class="choice-extension">
+        <span
+          class="choice-extension"
+        >
           .${type.extension}
         </span>
+
       `;
 
-      button.onclick = () =>
-        chooseFileType(key);
+
+      button.addEventListener(
+        "click",
+        () => chooseFileType(key)
+      );
+
 
       picker.appendChild(button);
 
     });
 
-  modalText.after(picker);
 
-  modalOverlay.classList.remove("hidden");
+  modalText.after(
+    picker
+  );
+
+
+  modalOverlay.classList.remove(
+    "hidden"
+  );
+
 }
 
 
 function chooseFileType(key) {
 
-  selectedType = FILE_TYPES[key];
+  selectedType =
+    FILE_TYPES[key];
+
 
   document
-    .querySelector(".file-type-picker")
+    .querySelector(
+      ".file-type-picker"
+    )
     ?.remove();
+
 
   modalTitle.textContent =
     `New ${selectedType.label} File`;
 
+
   modalText.textContent =
     `Enter a filename for your .${selectedType.extension} file.`;
+
 
   modalInput.style.display =
     "block";
 
+
   modalConfirm.style.display =
     "inline-flex";
+
+
+  modalConfirm.textContent =
+    "Create";
+
 
   modalInput.value =
     selectedType.defaultName;
 
-  setTimeout(() => {
-    modalInput.focus();
-    modalInput.select();
-  }, 50);
+
+  setTimeout(
+    () => {
+
+      modalInput.focus();
+
+      modalInput.select();
+
+    },
+    50
+  );
+
 }
+
+
+modalConfirm.addEventListener(
+  "click",
+  createSelectedFile
+);
+
+
+modalInput.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      createSelectedFile();
+
+    }
+
+  }
+);
 
 
 function createSelectedFile() {
 
   if (!selectedType) return;
 
+
   let name =
     modalInput.value.trim();
 
+
   if (!name) return;
 
+
   if (
-    !name.toLowerCase().endsWith(
-      "." + selectedType.extension
-    )
+    !name
+      .toLowerCase()
+      .endsWith(
+        "." +
+        selectedType.extension
+      )
   ) {
+
     name +=
-      "." + selectedType.extension;
+      "." +
+      selectedType.extension;
+
   }
+
 
   const exists =
     project.files.some(
       file =>
-        file.name.toLowerCase() ===
+        file.name
+          .toLowerCase() ===
         name.toLowerCase()
     );
 
+
   if (exists) {
-    alert("That file already exists.");
+
+    alert(
+      "A file with that name already exists."
+    );
+
     return;
+
   }
+
 
   const file = {
     id: createId(),
     name,
-    content: selectedType.content
+    content:
+      selectedType.content
   };
+
 
   project.files.push(file);
 
-  project.activeFileId = file.id;
+  project.activeFileId =
+    file.id;
 
-  project.openTabs.push(file.id);
+
+  project.openTabs.push(
+    file.id
+  );
+
+
+  editor.value =
+    file.content;
+
 
   closeModal();
 
-  loadActiveFile();
   updateEverything();
+
   saveProject();
 
-  editor.focus();
 }
 
 
 function closeModal() {
 
   document
-    .querySelector(".file-type-picker")
+    .querySelector(
+      ".file-type-picker"
+    )
     ?.remove();
 
-  modalOverlay.classList.add("hidden");
+
+  modalOverlay.classList.add(
+    "hidden"
+  );
+
 
   modalInput.style.display =
     "block";
 
+
   modalConfirm.style.display =
     "inline-flex";
 
+
   selectedType = null;
+
 }
 
 
-modalConfirm.onclick =
-  createSelectedFile;
+modalCancel.addEventListener(
+  "click",
+  closeModal
+);
 
-modalCancel.onclick =
-  closeModal;
 
-modalInput.onkeydown =
+modalOverlay.addEventListener(
+  "click",
   event => {
 
-    if (event.key === "Enter") {
-      createSelectedFile();
+    if (
+      event.target === modalOverlay
+    ) {
+
+      closeModal();
+
     }
 
-  };
+  }
+);
 
 
-/* IMPORT */
+/* =========================
+   RENAME PROJECT
+========================= */
 
-function openImport() {
-  fileInput.value = "";
-  fileInput.click();
-}
+document
+  .getElementById(
+    "renameProjectButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
 
-fileInput.onchange =
+      const name =
+        prompt(
+          "Project name:",
+          project.name
+        );
+
+
+      if (
+        name &&
+        name.trim()
+      ) {
+
+        project.name =
+          name.trim();
+
+
+        projectNameElement.textContent =
+          project.name;
+
+
+        saveProject();
+
+      }
+
+    }
+);
+
+
+/* =========================
+   IMPORT
+========================= */
+
+document
+  .getElementById(
+    "importButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      fileInput.value = "";
+
+      fileInput.click();
+
+    }
+);
+
+
+fileInput.addEventListener(
+  "change",
   async () => {
 
     const files =
       [...fileInput.files];
+
 
     for (const imported of files) {
 
       const content =
         await imported.text();
 
-      const exists =
-        project.files.some(
-          file =>
-            file.name.toLowerCase() ===
-            imported.name.toLowerCase()
-        );
 
-      if (!exists) {
+      project.files.push({
+        id: createId(),
+        name: imported.name,
+        content
+      });
 
-        project.files.push({
-          id: createId(),
-          name: imported.name,
-          content
-        });
-
-      }
     }
 
-    const last =
-      project.files.at(-1);
 
-    if (last) {
+    if (files.length) {
 
-      project.activeFileId =
-        last.id;
+      openFile(
+        project.files.at(-1).id
+      );
 
-      if (
-        !project.openTabs.includes(
-          last.id
-        )
-      ) {
-        project.openTabs.push(last.id);
-      }
     }
 
-    loadActiveFile();
+
     updateEverything();
+
     saveProject();
-  };
+
+  }
+);
 
 
-/* EXPORT */
+/* =========================
+   EXPORT FILE
+========================= */
 
 function exportCurrentFile() {
 
   const file =
     getActiveFile();
 
-  if (!file) return;
+
+  if (!file) {
+
+    alert(
+      "Open a file first."
+    );
+
+    return;
+
+  }
+
 
   const blob =
     new Blob(
       [file.content],
-      { type: "text/plain" }
+      {
+        type: "text/plain"
+      }
     );
+
 
   const url =
     URL.createObjectURL(blob);
 
+
   const link =
     document.createElement("a");
 
+
   link.href = url;
-  link.download = file.name;
+
+  link.download =
+    file.name;
+
+
+  document.body.appendChild(link);
 
   link.click();
 
+  link.remove();
+
+
   URL.revokeObjectURL(url);
+
 }
 
 
+/* =========================
+   EXPORT PROJECT
+========================= */
+
 function exportProject() {
 
-  const data = {
+  const exportData = {
     name: project.name,
-    files: project.files
+
+    files:
+      project.files.map(
+        file => ({
+          name: file.name,
+          content: file.content
+        })
+      )
   };
+
 
   const blob =
     new Blob(
       [
         JSON.stringify(
-          data,
+          exportData,
           null,
           2
         )
@@ -1473,94 +1566,96 @@ function exportProject() {
       }
     );
 
+
   const url =
     URL.createObjectURL(blob);
 
+
   const link =
     document.createElement("a");
+
 
   link.href = url;
 
   link.download =
     `${project.name}.json`;
 
+
+  document.body.appendChild(link);
+
   link.click();
 
+  link.remove();
+
+
   URL.revokeObjectURL(url);
+
 }
 
 
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
 
 [
   "newFileButton",
   "addFileButton",
   "emptyNewFileButton"
-].forEach(id => {
+]
+.forEach(id => {
 
   document
     .getElementById(id)
-    .onclick =
-      openNewFilePicker;
+    .addEventListener(
+      "click",
+      openNewFilePicker
+    );
 
 });
 
 
 document
-  .getElementById("importButton")
-  .onclick =
-    openImport;
-
-document
-  .getElementById("importSidebarButton")
-  .onclick =
-    openImport;
-
-document
-  .getElementById("exportButton")
-  .onclick =
-    exportCurrentFile;
-
-document
-  .getElementById("exportProjectButton")
-  .onclick =
-    exportProject;
+  .getElementById(
+    "exportButton"
+  )
+  .addEventListener(
+    "click",
+    exportCurrentFile
+  );
 
 
 document
-  .getElementById("renameProjectButton")
-  .onclick =
-    () => {
-
-      const name =
-        prompt(
-          "Project name:",
-          project.name
-        );
-
-      if (name?.trim()) {
-
-        project.name =
-          name.trim();
-
-        projectNameElement.textContent =
-          project.name;
-
-        saveProject();
-
-      }
-
-    };
+  .getElementById(
+    "exportProjectButton"
+  )
+  .addEventListener(
+    "click",
+    exportProject
+  );
 
 
-/* START */
+/* =========================
+   START
+========================= */
 
 loadProject();
+
 
 projectNameElement.textContent =
   project.name;
 
-loadActiveFile();
+
+const active =
+  getActiveFile();
+
+
+if (active) {
+
+  editor.value =
+    active.content;
+
+}
+
 
 updateEverything();
 
