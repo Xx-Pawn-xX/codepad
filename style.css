@@ -1,37 +1,26 @@
 :root {
 
-  --bg:
-    #f6f7f9;
+  --bg: #09090b;
+  --surface: #111113;
+  --surface-2: #18181b;
+  --surface-3: #202024;
 
-  --surface:
-    #ffffff;
+  --sidebar: #0d0d0f;
 
-  --sidebar:
-    #f2f3f5;
+  --border: #27272a;
+  --border-light: #35353a;
 
-  --border:
-    #e2e5e9;
+  --text: #f4f4f5;
+  --muted: #8b8b95;
 
-  --border-dark:
-    #d4d8de;
+  --accent: #ffffff;
+  --accent-text: #09090b;
 
-  --text:
-    #1d232d;
+  --editor: #0b0b0d;
 
-  --muted:
-    #7a8390;
+  --line: #55555f;
 
-  --accent:
-    #2563eb;
-
-  --accent-light:
-    #e8efff;
-
-  --editor:
-    #ffffff;
-
-  --line:
-    #a0a8b5;
+  --danger: #ef4444;
 
 }
 
@@ -52,18 +41,16 @@ body {
 
   overflow: hidden;
 
+  background: var(--bg);
+
+  color: var(--text);
+
   font-family:
     Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
-  background:
-    var(--bg);
-
-  color:
-    var(--text);
 
 }
 
@@ -72,8 +59,7 @@ button,
 input,
 textarea {
 
-  font:
-    inherit;
+  font: inherit;
 
 }
 
@@ -84,8 +70,6 @@ button {
 
 }
 
-
-/* APP */
 
 .app {
 
@@ -99,7 +83,9 @@ button {
 }
 
 
-/* TOP BAR */
+/* =========================
+   TOP BAR
+========================= */
 
 .topbar {
 
@@ -113,11 +99,9 @@ button {
 
   justify-content: space-between;
 
-  padding:
-    0 18px;
+  padding: 0 18px;
 
-  background:
-    rgba(255,255,255,.92);
+  background: rgba(13, 13, 15, .96);
 
   border-bottom:
     1px solid var(--border);
@@ -145,13 +129,14 @@ button {
 
   place-items: center;
 
-  border-radius: 9px;
+  border-radius: 10px;
 
-  background:
-    var(--text);
+  background: #000;
 
-  color:
-    white;
+  border:
+    1px solid #2f2f35;
+
+  color: white;
 
   font-size: 11px;
 
@@ -164,12 +149,13 @@ button {
 
   margin: 0;
 
+  color: var(--text);
+
   font-size: 17px;
 
   font-weight: 700;
 
-  letter-spacing:
-    -.3px;
+  letter-spacing: -.4px;
 
 }
 
@@ -180,8 +166,7 @@ button {
 
   margin-top: 1px;
 
-  color:
-    var(--muted);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -199,30 +184,38 @@ button {
 }
 
 
-.icon-button,
-.small-button,
-.secondary-button {
+.icon-button {
+
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+
+  place-items: center;
 
   border:
-    1px solid var(--border);
+    1px solid var(--border-light);
 
-  background:
-    white;
+  border-radius: 9px;
 
-  color:
-    var(--text);
+  background: var(--surface);
 
-  border-radius: 8px;
+  color: var(--text);
+
+  font-size: 20px;
+
+  transition:
+    background .15s,
+    border-color .15s,
+    transform .1s;
 
 }
 
 
-.icon-button {
+.icon-button:hover {
 
-  width: 36px;
-  height: 36px;
-
-  font-size: 20px;
+  border-color:
+    var(--accent);
 
 }
 
@@ -231,18 +224,28 @@ button {
 
   border: 0;
 
-  border-radius: 8px;
+  border-radius: 9px;
 
-  padding:
-    9px 15px;
+  padding: 9px 16px;
 
   background:
     var(--accent);
 
   color:
-    white;
+    var(--accent-text);
 
-  font-weight: 600;
+  font-weight: 700;
+
+  transition:
+    opacity .15s,
+    transform .1s;
+
+}
+
+
+.primary-button:hover {
+
+  opacity: .9;
 
 }
 
@@ -253,12 +256,14 @@ button {
 .secondary-button:active {
 
   transform:
-    scale(.97);
+    scale(.96);
 
 }
 
 
-/* WORKSPACE */
+/* =========================
+   WORKSPACE
+========================= */
 
 .workspace {
 
@@ -271,11 +276,13 @@ button {
 }
 
 
-/* SIDEBAR */
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar {
 
-  width: 245px;
+  width: 250px;
 
   flex-shrink: 0;
 
@@ -311,25 +318,26 @@ button {
 
 .small-label {
 
-  color:
-    var(--muted);
+  color: var(--muted);
 
   font-size: 9px;
 
   font-weight: 700;
 
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 
 }
 
 
 .project-name {
 
-  margin-top: 4px;
+  margin-top: 5px;
+
+  color: var(--text);
 
   font-size: 14px;
 
-  font-weight: 600;
+  font-weight: 650;
 
   white-space: nowrap;
 
@@ -337,20 +345,42 @@ button {
 
   text-overflow: ellipsis;
 
-  max-width: 140px;
+  max-width: 145px;
 
 }
 
 
 .small-button {
 
-  padding:
-    5px 8px;
+  padding: 6px 9px;
+
+  border:
+    1px solid var(--border-light);
+
+  border-radius: 7px;
+
+  background:
+    var(--surface);
+
+  color:
+    var(--muted);
 
   font-size: 11px;
 
 }
 
+
+.small-button:hover {
+
+  color:
+    var(--text);
+
+}
+
+
+/* =========================
+   FILE HEADER
+========================= */
 
 .sidebar-title {
 
@@ -361,7 +391,7 @@ button {
   justify-content: space-between;
 
   padding:
-    15px 15px 9px;
+    16px 15px 9px;
 
   color:
     var(--muted);
@@ -370,19 +400,23 @@ button {
 
   font-weight: 700;
 
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 
 }
 
 
 .sidebar-title button {
 
-  width: 25px;
-  height: 25px;
+  width: 27px;
+  height: 27px;
+
+  display: grid;
+
+  place-items: center;
 
   border: 0;
 
-  border-radius: 6px;
+  border-radius: 7px;
 
   background:
     transparent;
@@ -390,10 +424,25 @@ button {
   color:
     var(--muted);
 
-  font-size: 19px;
+  font-size: 20px;
 
 }
 
+
+.sidebar-title button:hover {
+
+  background:
+    var(--surface-2);
+
+  color:
+    var(--text);
+
+}
+
+
+/* =========================
+   FILE LIST
+========================= */
 
 .file-list {
 
@@ -401,8 +450,7 @@ button {
 
   overflow-y: auto;
 
-  padding:
-    0 7px;
+  padding: 0 7px;
 
 }
 
@@ -415,21 +463,30 @@ button {
 
   justify-content: space-between;
 
-  gap: 8px;
+  gap: 7px;
 
   width: 100%;
 
   padding:
-    10px 9px;
+    8px 9px;
 
-  border-radius: 7px;
+  border-radius: 8px;
 
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 
   color:
-    #4d5664;
+    var(--muted);
 
-  font-size: 13px;
+  transition:
+    background .12s;
+
+}
+
+
+.file-item:hover {
+
+  background:
+    var(--surface-2);
 
 }
 
@@ -437,12 +494,10 @@ button {
 .file-item.active {
 
   background:
-    var(--accent-light);
+    var(--surface-3);
 
   color:
-    var(--accent);
-
-  font-weight: 600;
+    var(--text);
 
 }
 
@@ -450,6 +505,8 @@ button {
 .file-main {
 
   min-width: 0;
+
+  flex: 1;
 
   display: flex;
 
@@ -459,14 +516,38 @@ button {
 
   overflow: hidden;
 
+  cursor: pointer;
+
 }
 
 
 .file-icon {
 
+  width: 27px;
+
+  height: 19px;
+
   flex-shrink: 0;
 
-  font-size: 14px;
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 5px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--file-color, #888) 18%,
+      transparent
+    );
+
+  color:
+    var(--file-color, #aaa);
+
+  font-size: 9px;
+
+  font-weight: 800;
 
 }
 
@@ -479,15 +560,49 @@ button {
 
   white-space: nowrap;
 
+  font-size: 13px;
+
+}
+
+
+.file-tag {
+
+  flex-shrink: 0;
+
+  padding:
+    3px 5px;
+
+  border-radius: 4px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--file-color, #888) 15%,
+      transparent
+    );
+
+  color:
+    var(--file-color, #aaa);
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: .4px;
+
 }
 
 
 .delete-file {
 
-  width: 23px;
-  height: 23px;
+  width: 24px;
+  height: 24px;
 
   flex-shrink: 0;
+
+  display: grid;
+
+  place-items: center;
 
   border: 0;
 
@@ -499,21 +614,29 @@ button {
   color:
     var(--muted);
 
+  font-size: 17px;
+
   opacity: .6;
 
 }
 
 
-.delete-file:active {
+.delete-file:hover {
 
   background:
-    #ffe5e5;
+    rgba(239,68,68,.12);
 
   color:
-    #dc2626;
+    #ef4444;
+
+  opacity: 1;
 
 }
 
+
+/* =========================
+   SIDEBAR FOOTER
+========================= */
 
 .sidebar-footer {
 
@@ -530,25 +653,42 @@ button {
   width: 100%;
 
   padding:
-    9px;
+    10px;
 
   border:
-    1px solid var(--border);
+    1px solid var(--border-light);
 
-  border-radius: 7px;
+  border-radius: 8px;
 
   background:
-    white;
+    var(--surface);
 
   color:
-    #4b5563;
+    var(--muted);
 
   font-size: 12px;
+
+  transition:
+    border-color .15s,
+    color .15s;
 
 }
 
 
-/* EDITOR */
+.sidebar-footer button:hover {
+
+  border-color:
+    var(--accent);
+
+  color:
+    var(--text);
+
+}
+
+
+/* =========================
+   EDITOR
+========================= */
 
 .editor-area {
 
@@ -570,26 +710,30 @@ button {
 }
 
 
-/* TABS */
+/* =========================
+   TABS
+========================= */
 
 .tabs {
 
-  min-height: 42px;
+  min-height: 43px;
 
   display: flex;
 
   overflow-x: auto;
 
+  background:
+    #0d0d0f;
+
   border-bottom:
     1px solid var(--border);
-
-  background:
-    #fafbfc;
 
 }
 
 
 .tab {
+
+  position: relative;
 
   display: flex;
 
@@ -600,7 +744,7 @@ button {
   flex-shrink: 0;
 
   padding:
-    0 14px;
+    0 13px;
 
   border-right:
     1px solid var(--border);
@@ -613,16 +757,39 @@ button {
 }
 
 
+.tab:hover {
+
+  background:
+    var(--surface);
+
+}
+
+
 .tab.active {
 
   background:
-    white;
+    var(--editor);
 
   color:
     var(--text);
 
-  box-shadow:
-    inset 0 -2px 0 var(--accent);
+}
+
+
+.tab.active::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 2px;
+
+  background:
+    var(--file-color, var(--accent));
 
 }
 
@@ -637,14 +804,24 @@ button {
   color:
     var(--muted);
 
-  font-size: 16px;
+  font-size: 17px;
 
   padding: 0;
 
 }
 
 
-/* EMPTY */
+.tab-close:hover {
+
+  color:
+    var(--text);
+
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
 
 .empty-state {
 
@@ -672,25 +849,25 @@ button {
 
 .empty-icon {
 
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
 
   display: grid;
 
   place-items: center;
 
-  margin-bottom: 15px;
+  margin-bottom: 17px;
 
   border:
-    1px solid var(--border);
+    1px solid var(--border-light);
 
-  border-radius: 16px;
-
-  color:
-    var(--accent);
+  border-radius: 17px;
 
   background:
-    #f8faff;
+    var(--surface);
+
+  color:
+    white;
 
   font-size: 18px;
 
@@ -701,7 +878,9 @@ button {
 
   margin: 0;
 
-  font-size: 19px;
+  font-size: 20px;
+
+  letter-spacing: -.3px;
 
 }
 
@@ -709,7 +888,7 @@ button {
 .empty-state p {
 
   margin:
-    7px 0 18px;
+    7px 0 19px;
 
   color:
     var(--muted);
@@ -719,7 +898,9 @@ button {
 }
 
 
-/* EDITOR */
+/* =========================
+   CODE EDITOR
+========================= */
 
 .editor-wrapper {
 
@@ -743,17 +924,17 @@ button {
 
 .line-numbers {
 
-  width: 52px;
+  width: 55px;
 
   flex-shrink: 0;
 
   overflow: hidden;
 
   padding:
-    16px 10px;
+    16px 11px;
 
   background:
-    #fafbfc;
+    #0d0d0f;
 
   border-right:
     1px solid var(--border);
@@ -773,7 +954,7 @@ button {
 
   font-size: 14px;
 
-  line-height: 1.55;
+  line-height: 1.6;
 
   user-select: none;
 
@@ -796,10 +977,10 @@ button {
     16px;
 
   background:
-    white;
+    var(--editor);
 
   color:
-    #202631;
+    #e4e4e7;
 
   font-family:
     ui-monospace,
@@ -811,20 +992,37 @@ button {
 
   font-size: 14px;
 
-  line-height: 1.55;
+  line-height: 1.6;
 
   tab-size: 2;
 
   overflow: auto;
 
+  caret-color:
+    var(--accent);
+
 }
 
 
-/* STATUS */
+#editor::selection {
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 25%,
+      transparent
+    );
+
+}
+
+
+/* =========================
+   STATUS BAR
+========================= */
 
 .statusbar {
 
-  height: 30px;
+  height: 31px;
 
   flex-shrink: 0;
 
@@ -835,13 +1033,13 @@ button {
   justify-content: space-between;
 
   padding:
-    0 12px;
+    0 13px;
 
   border-top:
     1px solid var(--border);
 
   background:
-    #fafbfc;
+    #0d0d0f;
 
   color:
     var(--muted);
@@ -855,19 +1053,21 @@ button {
 
   display: flex;
 
-  gap: 15px;
+  gap: 16px;
 
 }
 
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
 
 .search-panel {
 
   position: fixed;
 
   right: 20px;
-  top: 75px;
+  top: 76px;
 
   z-index: 20;
 
@@ -877,19 +1077,18 @@ button {
 
   gap: 8px;
 
-  padding:
-    8px;
+  padding: 8px;
 
   border:
-    1px solid var(--border);
+    1px solid var(--border-light);
 
   border-radius: 10px;
 
   background:
-    white;
+    var(--surface);
 
   box-shadow:
-    0 12px 35px rgba(0,0,0,.12);
+    0 20px 70px rgba(0,0,0,.55);
 
 }
 
@@ -906,14 +1105,28 @@ button {
   width: 210px;
 
   border:
-    1px solid var(--border);
+    1px solid var(--border-light);
 
-  border-radius: 6px;
+  border-radius: 7px;
 
   padding:
-    8px;
+    8px 9px;
 
   outline: none;
+
+  background:
+    var(--surface-2);
+
+  color:
+    var(--text);
+
+}
+
+
+.search-panel input:focus {
+
+  border-color:
+    var(--accent);
 
 }
 
@@ -945,7 +1158,9 @@ button {
 }
 
 
-/* MODAL */
+/* =========================
+   MODAL
+========================= */
 
 .modal-overlay {
 
@@ -964,10 +1179,10 @@ button {
   padding: 20px;
 
   background:
-    rgba(20,25,35,.25);
+    rgba(0,0,0,.65);
 
   backdrop-filter:
-    blur(3px);
+    blur(5px);
 
 }
 
@@ -981,17 +1196,23 @@ button {
 
 .modal {
 
-  width: min(400px, 100%);
+  width:
+    min(400px, 100%);
 
-  padding: 22px;
+  padding:
+    22px;
 
-  border-radius: 14px;
+  border:
+    1px solid var(--border-light);
+
+  border-radius:
+    14px;
 
   background:
-    white;
+    var(--surface);
 
   box-shadow:
-    0 25px 80px rgba(0,0,0,.18);
+    0 30px 100px rgba(0,0,0,.7);
 
 }
 
@@ -999,6 +1220,9 @@ button {
 .modal h2 {
 
   margin: 0;
+
+  color:
+    var(--text);
 
   font-size: 18px;
 
@@ -1008,7 +1232,7 @@ button {
 .modal p {
 
   margin:
-    6px 0 15px;
+    7px 0 16px;
 
   color:
     var(--muted);
@@ -1026,11 +1250,18 @@ button {
     11px;
 
   border:
-    1px solid var(--border-dark);
+    1px solid var(--border-light);
 
-  border-radius: 8px;
+  border-radius:
+    8px;
 
   outline: none;
+
+  background:
+    var(--surface-2);
+
+  color:
+    var(--text);
 
 }
 
@@ -1051,7 +1282,7 @@ button {
 
   gap: 8px;
 
-  margin-top: 15px;
+  margin-top: 16px;
 
 }
 
@@ -1061,12 +1292,80 @@ button {
   padding:
     9px 14px;
 
+  border:
+    1px solid var(--border-light);
+
+  border-radius:
+    8px;
+
+  background:
+    var(--surface-2);
+
+  color:
+    var(--text);
+
 }
 
 
-/* MOBILE */
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+
+  width: 8px;
+  height: 8px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+  background:
+    transparent;
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    #303035;
+
+  border-radius:
+    10px;
+
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+  background:
+    #48484f;
+
+}
+
+
+/* =========================
+   IPAD / MOBILE
+========================= */
 
 @media (max-width: 700px) {
+
+  .topbar {
+
+    padding:
+      0 10px;
+
+  }
+
+
+  .brand span {
+
+    display: none;
+
+  }
+
 
   .sidebar {
 
@@ -1078,44 +1377,15 @@ button {
     top: 0;
     bottom: 0;
 
-    width: 230px;
+    width: 240px;
+
+    display: none;
 
     box-shadow:
-      15px 0 40px rgba(0,0,0,.12);
+      20px 0 60px rgba(0,0,0,.6);
 
   }
 
-  .workspace {
-
-    position: relative;
-
-  }
-
-  .topbar {
-
-    padding:
-      0 10px;
-
-  }
-
-  .brand span {
-
-    display: none;
-
-  }
-
-  .project-header {
-
-    padding:
-      13px;
-
-  }
-
-  .sidebar {
-
-    display: none;
-
-  }
 
   .sidebar.open {
 
@@ -1123,9 +1393,13 @@ button {
 
   }
 
-  .board-placeholder {
-    display: none;
+
+  .workspace {
+
+    position: relative;
+
   }
+
 
   #editor {
 
@@ -1133,11 +1407,23 @@ button {
 
   }
 
+
   .line-numbers {
 
-    width: 42px;
+    width: 45px;
+
+    padding:
+      16px 8px;
 
     font-size: 12px;
+
+  }
+
+
+  .project-header {
+
+    padding:
+      14px;
 
   }
 
